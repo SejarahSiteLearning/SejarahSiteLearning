@@ -1,0 +1,2603 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <base target="_top">
+    <title>LMS Modern Edmodo - CAT ASN</title>
+    <style>
+        :root {
+            --bg-main: #f1f5f9;
+            --sidebar-bg: #1e293b;
+            --sidebar-text: #f8fafc;
+            --card-white: #ffffff;
+            --primary-blue: #4f46e5;
+            --primary-hover: #4338ca;
+            --text-dark: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --font-base: 14px;
+            --font-small: 12px;
+            --font-large: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-dark);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            font-size: var(--font-base);
+            line-height: 1.5;
+            opacity: 0;
+            animation: pageLoad 0.5s forwards;
+        }
+
+        @keyframes pageLoad {
+            to {
+                opacity: 1;
+            }
+        }
+
+        .wrapper {
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .sidebar {
+            width: 260px;
+            background-color: var(--sidebar-bg);
+            color: var(--sidebar-text);
+            padding: 20px 18px;
+            box-sizing: border-box;
+            display: none;
+            flex-direction: column;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+            z-index: 99;
+            font-size: var(--font-small);
+        }
+        .sidebar.active-sidebar {
+            display: flex;
+        }
+
+        .sidebar h2 {
+            color: #818cf8;
+            font-size: 20px;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-weight: 700;
+            text-align: center;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 12px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            flex-grow: 1;
+        }
+        .sidebar-menu li {
+            padding: 10px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #cbd5e1;
+            transition: all 0.2s ease;
+            font-size: var(--font-small);
+        }
+        .sidebar-menu li:hover,
+        .sidebar-menu li.active-menu {
+            background-color: var(--primary-blue);
+            color: white;
+            transform: translateX(4px);
+        }
+
+        .top-navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--card-white);
+            padding: 10px 24px;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+            margin: -30px -30px 20px -30px;
+            position: sticky;
+            top: 0;
+            z-index: 98;
+        }
+
+        .user-profile-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .user-profile-header img {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary-blue);
+        }
+
+        .btn-menu-toggle {
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            display: none;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-menu-toggle:hover {
+            background: var(--primary-hover);
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            box-sizing: border-box;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .btn-menu-toggle {
+                display: inline-flex;
+            }
+            .top-navbar {
+                margin: -15px -15px 15px -15px;
+                padding: 10px 15px;
+            }
+            .desktop-only {
+                display: none !important;
+            }
+
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: -280px;
+                height: 100vh;
+                z-index: 1000;
+                width: 280px;
+            }
+            .sidebar.mobile-open {
+                left: 0;
+            }
+
+            .main-content {
+                padding: 15px !important;
+            }
+            .login-container {
+                margin: 30px 15px !important;
+            }
+            .card {
+                padding: 16px !important;
+            }
+            .table-responsive {
+                display: block;
+                width: 100%;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+        }
+        @media (min-width: 769px) {
+            .sidebar.desktop-closed {
+                display: none !important;
+            }
+        }
+
+        .login-container {
+            max-width: 400px;
+            margin: 80px auto;
+            padding: 16px;
+        }
+        .login-card {
+            background: var(--card-white);
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            animation: cardSlideUp 0.5s ease forwards;
+        }
+        @keyframes cardSlideUp {
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            background-color: var(--card-white);
+            border-radius: 10px;
+            padding: 18px 20px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow-sm);
+            border-top: 3px solid var(--primary-blue);
+            box-sizing: border-box;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .topic-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .topic-body-detail {
+            display: none;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        input[type="text"],
+        input[type="password"],
+        input[type="datetime-local"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 8px 12px;
+            margin: 4px 0 12px 0;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: var(--font-small);
+            background: #f8fafc;
+            color: var(--text-dark);
+            transition: outline 0.2s;
+        }
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: 2px solid var(--primary-blue);
+            background: #ffffff;
+        }
+
+        label {
+            font-weight: 600;
+            font-size: var(--font-small);
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .btn {
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: var(--font-small);
+            transition: background 0.2s, transform 0.1s;
+            display: inline-block;
+        }
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
+        .btn:active {
+            transform: scale(0.97);
+        }
+        .btn-danger {
+            background-color: #ef4444;
+        }
+        .btn-danger:hover {
+            background-color: #dc2626;
+        }
+        .btn-secondary {
+            background-color: #64748b;
+        }
+        .btn-secondary:hover {
+            background-color: #475569;
+        }
+        .btn-warning {
+            background-color: #f59e0b;
+        }
+        .btn-warning:hover {
+            background-color: #d97706;
+        }
+
+        .btn-sub-kata {
+            background: none;
+            border: none;
+            color: var(--primary-blue);
+            font-weight: 600;
+            font-size: var(--font-small);
+            cursor: pointer;
+            padding: 4px 10px;
+            transition: all 0.2s;
+            border-radius: 4px;
+        }
+        .btn-sub-kata:hover {
+            color: var(--primary-hover);
+            background: #e0e7ff;
+        }
+
+        #ujian-cat-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #f8fafc;
+            color: var(--text-dark);
+            z-index: 999999;
+            padding: 0;
+            box-sizing: border-box;
+            display: none;
+            overflow-y: auto;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: var(--font-small);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .badge-success {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+        .badge-danger {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+        .badge-info {
+            background-color: #e0f2fe;
+            color: #075985;
+            margin-right: 6px;
+        }
+
+        .nested-student-card {
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-top: 8px;
+            font-size: var(--font-small);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: var(--font-small);
+        }
+        th,
+        td {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            text-align: left;
+        }
+        th {
+            background-color: #f1f5f9;
+            font-weight: 700;
+        }
+
+        .cat-number-box {
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            border: 1px solid #cbd5e1;
+            transition: all 0.2s;
+            font-size: var(--font-small);
+        }
+
+        .custom-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(15, 23, 42, 0.5);
+            z-index: 9999999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(4px);
+        }
+        .custom-modal-box {
+            background: #ffffff;
+            padding: 24px 28px;
+            border-radius: 14px;
+            box-shadow: var(--shadow-md);
+            transform: scale(0.9);
+            animation: popIn 0.2s ease forwards;
+            max-width: 420px;
+            width: 90%;
+        }
+        @keyframes popIn {
+            to {
+                transform: scale(1);
+            }
+        }
+
+        .text-muted {
+            color: var(--text-muted);
+        }
+        .text-center {
+            text-align: center;
+        }
+        .mt-0 {
+            margin-top: 0;
+        }
+        .mb-0 {
+            margin-bottom: 0;
+        }
+        .mb-1 {
+            margin-bottom: 6px;
+        }
+        .mb-2 {
+            margin-bottom: 12px;
+        }
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .flex-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .gap-1 {
+            gap: 6px;
+        }
+        .gap-2 {
+            gap: 12px;
+        }
+        .w-full {
+            width: 100%;
+        }
+
+        h2 {
+            font-size: 20px;
+            font-weight: 700;
+            margin: 0 0 12px 0;
+        }
+        h3 {
+            font-size: 16px;
+            font-weight: 700;
+            margin: 0 0 8px 0;
+        }
+        h4 {
+            font-size: 14px;
+            font-weight: 700;
+            margin: 0 0 6px 0;
+        }
+        p {
+            margin: 0 0 8px 0;
+        }
+
+        #pdf-viewer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #f1f5f9;
+            z-index: 99999999;
+            display: none;
+            flex-direction: column;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        #pdf-viewer-overlay .pdf-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 16px;
+        }
+        #pdf-viewer-overlay .pdf-header h3 {
+            margin: 0;
+            color: var(--primary-blue);
+        }
+        #pdf-viewer-overlay .pdf-header .btn-close-pdf {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        #pdf-viewer-overlay .pdf-header .btn-close-pdf:hover {
+            background: #dc2626;
+        }
+        #pdf-viewer-overlay iframe {
+            width: 100%;
+            flex: 1;
+            border: none;
+            border-radius: 12px;
+            background: white;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .group-member-checkbox {
+            display: block;
+            margin: 6px 0;
+            padding: 8px;
+            background: var(--bg-main);
+            border-radius: 6px;
+            border-left: 3px solid transparent;
+        }
+        .group-member-checkbox input {
+            margin-right: 10px;
+        }
+        .group-member-checkbox.has-group {
+            background: #fef2f2;
+            border-left-color: #ef4444;
+            opacity: 0.7;
+        }
+        .group-member-checkbox.has-group label {
+            color: #991b1b;
+            font-style: italic;
+        }
+        .group-member-checkbox.available {
+            background: #f0fdf4;
+            border-left-color: #22c55e;
+        }
+
+        .choice-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+        }
+        .choice-container .btn {
+            flex: 1;
+            text-align: center;
+            padding: 6px 12px;
+            font-size: var(--font-small);
+        }
+        .task-container {
+            margin-bottom: 16px;
+            background: var(--bg-main);
+            padding: 14px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        .upload-area-individu {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f0fdf4;
+            border-radius: 6px;
+            border: 1px solid #86efac;
+        }
+
+        .group-info-box {
+            background: #dbeafe;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 6px;
+            border: 1px solid #93c5fd;
+            font-size: var(--font-small);
+        }
+        .group-info-box .member-list {
+            margin-top: 4px;
+            color: var(--text-muted);
+        }
+        .group-info-box .leader-name {
+            font-weight: 700;
+            color: var(--primary-blue);
+        }
+
+        /* Spinner kecil */
+        .spinner-sm {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #e2e8f0;
+            border-top: 2px solid var(--primary-blue);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            vertical-align: middle;
+            margin-right: 6px;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== OVERLAY ALERT & CONFIRM ===== -->
+    <div id="app-alert-overlay" class="custom-overlay">
+        <div class="custom-modal-box" style="text-align: center;">
+            <p id="app-alert-msg" style="margin-top:0; margin-bottom:16px; font-weight:500; font-size:15px; line-height:1.5;"></p>
+            <button class="btn" onclick="document.getElementById('app-alert-overlay').style.display='none'">Tutup</button>
+        </div>
+    </div>
+
+    <div id="app-confirm-overlay" class="custom-overlay">
+        <div class="custom-modal-box" style="text-align: center;">
+            <p id="app-confirm-msg" style="margin-top:0; margin-bottom:16px; font-weight:600; font-size:15px; line-height:1.5;"></p>
+            <div style="display:flex; gap:10px; justify-content:center;">
+                <button class="btn btn-secondary" onclick="tutupConfirm(false)">Batal</button>
+                <button class="btn btn-danger" onclick="tutupConfirm(true)">Ya, Lanjutkan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL DISKUSI KELAS ===== -->
+    <div id="modal-diskusi-kelas-overlay" class="custom-overlay">
+        <div class="custom-modal-box" style="max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; text-align: left;">
+            <div class="flex-between" style="border-bottom:2px solid var(--border-color); padding-bottom:10px; margin-bottom:12px;">
+                <h3 style="margin:0; color:var(--primary-blue);">Komentar Teman Sekelas</h3>
+                <button class="btn btn-secondary" style="padding:4px 10px;" onclick="document.getElementById('modal-diskusi-kelas-overlay').style.display='none'">✕</button>
+            </div>
+            <button class="btn btn-secondary w-full mb-2" style="font-size:var(--font-small);" onclick="muatUlangForumKelasSiswa()">↻ Segarkan Ruang Diskusi</button>
+            <div id="siswa-diskusi-kelas" class="nested-student-card">Memuat data diskusi kelas...</div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL BUAT KELOMPOK ===== -->
+    <div id="modal-create-group-overlay" class="custom-overlay">
+        <div class="custom-modal-box" style="max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; text-align: left;">
+            <div class="flex-between" style="border-bottom:2px solid var(--border-color); padding-bottom:10px; margin-bottom:12px;">
+                <h3 style="margin:0; color:var(--primary-blue);">Buat Kelompok Tugas</h3>
+                <button class="btn btn-secondary" style="padding:4px 10px;" onclick="tutupModalGroup()">✕</button>
+            </div>
+            <p style="font-size:var(--font-small); color:var(--text-muted);">
+                Pilih teman sekelas untuk diajak kelompok. <br>
+                <strong>Minimal total 3 orang (termasuk Anda), maksimal 5 orang.</strong>
+            </p>
+            <div id="list-classmates-container" style="margin:12px 0; max-height:300px; overflow-y:auto; border:1px solid var(--border-color); padding:10px; border-radius:8px;">
+                Memuat daftar teman...
+            </div>
+            <button class="btn w-full" style="padding:10px; font-size:15px;" onclick="buatKelompokDariModal()">Buat Kelompok</button>
+        </div>
+    </div>
+
+    <!-- ===== OVERLAY PELANGGARAN UJIAN ===== -->
+    <div id="fs-force-overlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(15,23,42,0.98); z-index:999999999; flex-direction:column; justify-content:center; align-items:center; text-align:center; color:white; padding:20px;">
+        <h2 style="color:#ef4444; font-size:24px; font-weight:900;">PELANGGARAN UJIAN</h2>
+        <p style="max-width:500px; font-size:15px; line-height:1.6; margin:16px 0;">Anda terdeteksi keluar dari layar penuh! Kembali ke layar penuh sekarang untuk melanjutkan.</p>
+        <button class="btn btn-danger" style="font-size:16px; padding:12px 32px;" onclick="kembaliFullscreenDariForce()">Kembali ke Mode Ujian</button>
+    </div>
+
+    <!-- ===== PDF VIEWER ===== -->
+    <div id="pdf-viewer-overlay">
+        <div class="pdf-header">
+            <h3 id="pdf-viewer-title">📄 Materi PDF</h3>
+            <button class="btn-close-pdf" onclick="tutupPdfViewer()">✕ Tutup</button>
+        </div>
+        <iframe id="pdf-viewer-iframe" src=""></iframe>
+    </div>
+
+    <!-- ===== LOGIN ===== -->
+    <div class="login-container" id="app-login">
+        <div class="login-card">
+            <h2 style="margin-top:0; color:var(--primary-blue); font-weight:800; font-size:24px; text-align:center;">History Learning Site</h2>
+            <p style="text-align:center; color:var(--text-muted); margin-bottom:20px; font-size:var(--font-small);">Platform Belajar Sejarah SMKN 5 Malang</p>
+
+            <label>Username</label>
+            <input type="text" id="u-name" placeholder="Masukkan NIS Anda">
+
+            <label>Password Akses</label>
+            <input type="password" id="u-pass" placeholder="Masukkan Pasword Anda">
+
+            <button class="btn w-full" style="padding:10px; font-size:15px; margin-top:6px;" onclick="doAppLogin()">LOGIN</button>
+            <div id="login-status" style="margin-top:10px; font-size:13px; color:#ef4444; text-align:center; display:none;"></div>
+        </div>
+    </div>
+
+    <!-- ===== SIDEBAR & MAIN ===== -->
+    <div class="wrapper">
+        <div class="sidebar" id="app-sidebar">
+            <h2>History Site</h2>
+            <ul class="sidebar-menu" id="menu-list"></ul>
+            <button class="btn btn-danger" style="margin-top:16px; font-size:var(--font-small);" onclick="doAppLogout()">Log Out</button>
+        </div>
+
+        <div class="main-content" id="app-main-content">
+
+            <div class="top-navbar">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <button class="btn-menu-toggle" onclick="toggleSidebarMenu()">☰</button>
+                    <h3 style="margin:0; font-size:15px; color:var(--text-dark);" id="page-title-header">Dasbor Utama</h3>
+                </div>
+                <div class="user-profile-header">
+                    <div style="text-align:right; display:none;" id="header-user-info" class="desktop-only">
+                        <div style="font-weight:700; font-size:13px; color:var(--text-dark);" id="header-nama"></div>
+                        <div style="font-size:11px; color:var(--text-muted); font-weight:600;" id="header-role"></div>
+                    </div>
+                    <img id="header-foto" src="" alt="Foto">
+                </div>
+            </div>
+
+            <!-- VIEW HOME -->
+            <div id="view-home" class="sub-view">
+                <h2 style="margin-top:0; font-weight:700; font-size:20px;">Selamat Datang, <span id="txt-welcome-nama" style="color:var(--primary-blue);"></span>!</h2>
+                <div class="card">
+                    <h3 style="margin-top:0; margin-bottom:12px; border-bottom:1px solid var(--border-color); padding-bottom:8px; font-size:15px;">Pengaturan & Biodata Akun</h3>
+                    <div style="display:flex; gap:20px; align-items:flex-start; flex-wrap:wrap;">
+
+                        <div style="flex-shrink:0; text-align:center; background:#f8fafc; padding:16px; border-radius:10px; border:1px solid var(--border-color); min-width:140px;">
+                            <img id="profile-pic-preview" src="https://via.placeholder.com/120" alt="Foto Profil" style="width:100px; height:100px; object-fit:cover; border-radius:50%; border:3px solid var(--primary-blue); margin-bottom:10px;">
+                            <br>
+                            <input type="file" id="input-foto-profil" accept="image/*" style="display:none;" onchange="previewProfilePic(event)">
+                            <button class="btn btn-secondary w-full" style="font-size:var(--font-small); padding:6px 12px;" onclick="document.getElementById('input-foto-profil').click()">Pilih Foto</button>
+                        </div>
+
+                        <div style="flex:1; min-width:260px;">
+                            <label>Username</label>
+                            <input type="text" id="bio-username" readonly style="background:#e2e8f0; cursor:not-allowed; color:var(--text-muted); font-weight:600;">
+
+                            <label>Nama Lengkap</label>
+                            <input type="text" id="bio-nama" readonly style="background:#e2e8f0; cursor:not-allowed; color:var(--text-muted); font-weight:600;">
+
+                            <div id="bio-siswa-fields" style="display:none;">
+                                <label>Tingkat</label>
+                                <input type="text" id="bio-tingkat" readonly style="background:#e2e8f0; cursor:not-allowed; color:var(--text-muted); font-weight:600;">
+
+                                <label>Kelas</label>
+                                <input type="text" id="bio-kelas" readonly style="background:#e2e8f0; cursor:not-allowed; color:var(--text-muted); font-weight:600;">
+                            </div>
+
+                            <label>Nomor Telepon / WA</label>
+                            <input type="text" id="bio-hp" placeholder="Contoh: 081234567890">
+
+                            <label>Alamat Rumah</label>
+                            <textarea id="bio-alamat" rows="2" placeholder="Masukkan alamat lengkap"></textarea>
+
+                            <label>Email Utama</label>
+                            <input type="text" id="bio-email" placeholder="Contoh: nama@sekolah.com">
+
+                            <label style="color:var(--primary-blue);">Ganti Password (kosongkan jika tidak)</label>
+                            <input type="password" id="bio-password" placeholder="Ketik password baru...">
+
+                            <button class="btn w-full" style="padding:10px; font-size:14px; margin-top:6px;" onclick="simpanBiodata()">Simpan Biodata</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW GURU - TOPIK -->
+            <div id="view-guru-topik" class="sub-view" style="display:none;">
+                <div class="flex-between mb-2">
+                    <h2 style="margin:0; font-weight:700; font-size:20px;">Kelola Modul</h2>
+                    <button class="btn" onclick="bukaFormTambahTopikBaru()">+ Tambah Modul</button>
+                </div>
+                <div id="box-form-topik" class="card" style="display:none; border-top:4px solid var(--text-dark);">
+                    <h3 id="form-topik-title" style="margin-top:0; font-size:15px;">Form Kendali Modul</h3>
+                    <input type="hidden" id="f-topik-is-edit">
+
+                    <label>Kode/ID Unik Modul</label>
+                    <input type="text" id="f-topik-id" placeholder="Contoh: MOD-01">
+
+                    <label>Nama/Judul Materi</label>
+                    <input type="text" id="f-topik-nama">
+
+                    <label>Tingkat Sasaran</label>
+                    <select id="f-topik-tingkat">
+                        <option value="X">Tingkat X</option>
+                        <option value="XI">Tingkat XI</option>
+                        <option value="XII">Tingkat XII</option>
+                        <option value="Umum">Terbuka Umum</option>
+                    </select>
+
+                    <div style="display:flex; flex-wrap:wrap; gap:12px;">
+                        <div style="flex:1; min-width:180px;">
+                            <label>Waktu Akses Dimulai</label>
+                            <input type="datetime-local" id="f-topik-rilis">
+                        </div>
+                        <div style="flex:1; min-width:180px;">
+                            <label>Batas Akhir</label>
+                            <input type="datetime-local" id="f-topik-berakhir">
+                        </div>
+                    </div>
+
+                    <h4 style="margin-top:12px; margin-bottom:6px; font-size:13px; color:var(--primary-blue);">Waktu Rilis Spesifik</h4>
+                    <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:12px; background:#f8fafc; padding:12px; border-radius:8px; border:1px solid var(--border-color);">
+                        <div style="flex:1; min-width:130px;">
+                            <label style="font-size:11px;">Pre Tes</label>
+                            <input type="datetime-local" id="f-topik-rilis-pre" style="margin-bottom:0;">
+                        </div>
+                        <div style="flex:1; min-width:130px;">
+                            <label style="font-size:11px;">Diskusi</label>
+                            <input type="datetime-local" id="f-topik-rilis-diskusi" style="margin-bottom:0;">
+                        </div>
+                        <div style="flex:1; min-width:130px;">
+                            <label style="font-size:11px;">Materi</label>
+                            <input type="datetime-local" id="f-topik-rilis-materi" style="margin-bottom:0;">
+                        </div>
+                        <div style="flex:1; min-width:130px;">
+                            <label style="font-size:11px;">Tugas</label>
+                            <input type="datetime-local" id="f-topik-rilis-tugas" style="margin-bottom:0;">
+                        </div>
+                        <div style="flex:1; min-width:130px;">
+                            <label style="font-size:11px;">Pos Tes</label>
+                            <input type="datetime-local" id="f-topik-rilis-post" style="margin-bottom:0;">
+                        </div>
+                    </div>
+
+                    <div class="flex-wrap gap-1">
+                        <button class="btn" onclick="prosesSimpanTopik()">Simpan Modul</button>
+                        <button class="btn btn-secondary" onclick="document.getElementById('box-form-topik').style.display='none'">Batal</button>
+                    </div>
+                </div>
+                <div id="list-topik-guru-cards"></div>
+            </div>
+
+            <!-- VIEW GURU - PENILAIAN -->
+            <div id="view-guru-penilaian" class="sub-view" style="display:none;">
+                <h2 style="font-weight:700; font-size:20px;">Panel Evaluasi</h2>
+                <div style="display:flex; flex-wrap:wrap; gap:12px; margin-bottom:16px; background:var(--card-white); padding:14px 18px; border-radius:10px; box-shadow:var(--shadow-sm);">
+                    <div style="flex:1; min-width:150px;">
+                        <label style="font-size:11px;">Filter Tingkat</label>
+                        <input type="text" id="f-nilai-tingkat" placeholder="Contoh: X" oninput="renderNilaiGuruKhusus()" style="margin-bottom:0;">
+                    </div>
+                    <div style="flex:1; min-width:150px;">
+                        <label style="font-size:11px;">Filter Kelas</label>
+                        <input type="text" id="f-nilai-kelas" placeholder="Contoh: AKL" oninput="renderNilaiGuruKhusus()" style="margin-bottom:0;">
+                    </div>
+                </div>
+                <div id="list-penilaian-guru"></div>
+            </div>
+
+            <!-- VIEW SISWA - TOPIK -->
+            <div id="view-siswa-topik" class="sub-view" style="display:none;">
+                <h2 style="margin-bottom:16px; font-weight:700; font-size:20px;">Modul Pembelajaran</h2>
+                <div id="list-topik-siswa-cards"></div>
+            </div>
+
+            <!-- VIEW SISWA - DETAIL TOPIK -->
+            <div id="view-siswa-detail-topik" class="sub-view" style="display:none;">
+                <div class="flex-between mb-2" style="background:var(--card-white); padding:14px 18px; border-radius:10px; box-shadow:var(--shadow-sm);">
+                    <h2 id="s-detail-title" style="margin:0; color:var(--primary-blue); font-weight:700; font-size:18px;">Judul Modul</h2>
+                    <button class="btn btn-secondary" style="font-size:var(--font-small);" onclick="gantiSubView('siswa-topik')">← Kembali</button>
+                </div>
+
+                <div class="card" style="border-top-color:#f59e0b; background:linear-gradient(to bottom right, #ffffff, #fffbeb);">
+                    <h3 style="margin-top:0; color:#b45309; font-size:15px;">Evaluasi Awal (Pre-Tes)</h3>
+                    <p style="color:var(--text-muted); font-size:var(--font-small); margin-bottom:10px;">Kerjakan sebelum materi. Waktu <b>60 Menit</b>.</p>
+                    <div style="background:rgba(255,255,255,0.7); padding:14px; border-radius:8px; border:1px solid #fde68a;">
+                        <p id="info-pre-attempts" style="margin-top:0; font-size:var(--font-small);"></p>
+                        <button class="btn btn-secondary" style="background-color:#d97706; margin-top:6px; font-size:var(--font-small);" id="btn-siswa-pre" onclick="konfirmasiMulaiUjianCAT('Pre')">Mulai Pre-Tes</button>
+                    </div>
+                </div>
+
+                <div class="card" id="box-diskusi-siswa-container" style="border-top-color:#10b981; background:linear-gradient(to bottom right, #ffffff, #f0fdfa);">
+                    <h3 style="margin-top:0; color:#047857; font-size:15px;">Ruang Diskusi</h3>
+                    <div id="dynamic-diskusi-forms"></div>
+
+                    <div style="margin-top:16px; border-top:2px solid #a7f3d0; padding-top:14px;">
+                        <h4 style="color:#059669; margin-top:0; font-size:14px;">Forum Antar Siswa</h4>
+                        <p style="font-size:var(--font-small); color:var(--text-muted); margin-bottom:10px;">Lihat tanggapan rekan sekelas.</p>
+                        <button class="btn btn-secondary" style="background-color:#059669; padding:8px 14px; font-size:var(--font-small); w-full; font-weight:600;" onclick="document.getElementById('modal-diskusi-kelas-overlay').style.display='flex'">Buka Komentar Kelas</button>
+                    </div>
+                </div>
+
+                <div class="card" style="border-top-color:#6366f1; background:linear-gradient(to bottom right, #ffffff, #eff6ff);">
+                    <h3 style="margin-top:0; color:#4338ca; font-size:15px;">Bahan Bacaan & Materi</h3>
+                    <p style="color:var(--text-muted); font-size:var(--font-small); margin-bottom:10px;">Dokumen PDF referensi utama modul.</p>
+                    <a class="btn" style="background-color:#4f46e5; text-decoration:none; font-size:var(--font-small);" id="btn-siswa-pdf" target="_blank" onclick="bukaPdfViewer(event)">Buka PDF</a>
+                </div>
+
+                <div class="card" id="box-tugas-siswa-container" style="border-top-color:#a855f7; background:linear-gradient(to bottom right, #ffffff, #faf5ff);">
+                    <h3 style="margin-top:0; color:#7e22ce; font-size:15px;">Penugasan Proyek</h3>
+                    <div id="dynamic-tugas-forms"></div>
+                </div>
+
+                <div class="card" style="border-top-color:#f43f5e; background:linear-gradient(to bottom right, #ffffff, #fff1f2);">
+                    <h3 style="margin-top:0; color:#be123c; font-size:15px;">Evaluasi Akhir (Pos-Tes)</h3>
+                    <p style="color:var(--text-muted); font-size:var(--font-small); margin-bottom:10px;">Ujian pencapaian akhir. Waktu <b>60 Menit</b>.</p>
+                    <div style="background:rgba(255,255,255,0.7); padding:14px; border-radius:8px; border:1px solid #fecdd3;">
+                        <p id="info-post-attempts" style="margin-top:0; font-size:var(--font-small);"></p>
+                        <button class="btn btn-secondary" style="background-color:#e11d48; margin-top:6px; font-size:var(--font-small);" id="btn-siswa-post" onclick="konfirmasiMulaiUjianCAT('Post')">Mulai Pos-Tes</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW SISWA - REKAP -->
+            <div id="view-siswa-rekap" class="sub-view" style="display:none;">
+                <h2 style="margin-bottom:16px; font-weight:700; font-size:20px;">Rekapitulasi Nilai</h2>
+                <div class="card" style="padding:0; overflow:hidden;">
+                    <div class="table-responsive">
+                        <table style="margin-top:0; border:none; font-size:var(--font-small);">
+                            <thead>
+                                <tr>
+                                    <th style="border-top:none; border-left:none;">Nama Topik</th>
+                                    <th style="border-top:none;">Pre-Tes</th>
+                                    <th style="border-top:none;">Pos-Tes</th>
+                                    <th style="border-top:none;">Diskusi</th>
+                                    <th style="border-top:none; border-right:none;">Tugas</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-rekap-siswa"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ===== UJIAN CAT ===== -->
+    <div id="ujian-cat-page">
+        <div style="background:var(--card-white); padding:12px 24px; border-bottom:1px solid var(--border-color); box-shadow:var(--shadow-sm); display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:100;">
+            <h2 style="color:var(--primary-blue); margin:0; font-weight:700; font-size:18px;">Ujian — <span id="lbl-cat-jenis"></span></h2>
+            <div style="display:flex; gap:12px; align-items:center;">
+                <div style="font-size:22px; font-weight:800; color:#ef4444; background:#fee2e2; padding:4px 14px; border-radius:6px;" id="cat-timer-display">60:00</div>
+                <div style="color:#ef4444; font-weight:600; font-size:12px; background:#fef2f2; padding:4px 10px; border-radius:6px; border:1px solid #fca5a5;" id="lbl-cat-warning">Awas: 0/3</div>
+            </div>
+        </div>
+
+        <div style="max-width: 800px; margin: 24px auto; padding: 0 16px;">
+            <div style="background:var(--card-white); padding:14px 18px; border-radius:10px; box-shadow:var(--shadow-sm); margin-bottom:20px;">
+                <span style="font-weight:600; font-size:12px; color:var(--text-muted); display:block; margin-bottom:8px;">Navigasi Soal:</span>
+                <div id="cat-grid-nomor-container" style="display:flex; gap:6px; flex-wrap:wrap;"></div>
+            </div>
+
+            <div id="box-render-soal-cat" style="font-size:15px; line-height:1.6; margin-bottom:20px;"></div>
+
+            <div style="display:flex; justify-content:space-between; margin-top:12px; align-items:center; gap:10px; flex-wrap:wrap;">
+                <button class="btn btn-secondary" style="font-size:var(--font-small);" id="btn-cat-prev" onclick="geserSoalCAT(-1)">← Sebelumnya</button>
+                <button class="btn btn-secondary" style="font-size:var(--font-small);" id="btn-cat-next" onclick="geserSoalCAT(1)">Selanjutnya →</button>
+            </div>
+
+            <div style="margin-top:30px; border-top:2px dashed var(--border-color); padding-top:20px; text-align:center;">
+                <button class="btn btn-danger" style="padding:12px 36px; font-size:16px; font-weight:700; border-radius:10px;" onclick="kalkulasiSelesaiUjianCAT()">Kirim Jawaban</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- ======================== SCRIPT ============================== -->
+    <!-- ============================================================ -->
+    <script>
+        // ===================================================================
+        //  KONFIGURASI: GANTI URL_INI dengan URL Web App GAS Anda
+        // ===================================================================
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbz3...../exec'; // <-- GANTI
+
+        // ===================================================================
+        //  CLIENT API WRAPPER (menggantikan google.script.run)
+        // ===================================================================
+        async function callGAS(action, ...args) {
+            const payload = { action, args };
+            try {
+                const resp = await fetch(GAS_URL, {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!resp.ok) {
+                    const txt = await resp.text();
+                    throw new Error(`HTTP ${resp.status}: ${txt}`);
+                }
+                const result = await resp.json();
+                if (result.error) {
+                    throw new Error(result.error);
+                }
+                return result.data;
+            } catch (err) {
+                console.error('[callGAS]', action, err);
+                throw err;
+            }
+        }
+
+        // ===================================================================
+        //  GLOBAL VARIABLES
+        // ===================================================================
+        let userSession = null;
+        let globalTopikList = [];
+        let databaseNilaiGuru = [];
+        let currentActiveTopikId = null;
+        let studentTopicStatus = null;
+        let temporarySoalListGuru = [];
+        let activeExamQuestions = [];
+        let userSelectedAnswers = [];
+        let currentQuestionIndex = 0;
+        let screenViolationCounter = 0;
+        let isCurrentlyInExam = false;
+        let currentBase64Foto = null;
+        let examTimerInterval;
+        let examTimeRemaining = 3600;
+        let currentGroupInfo = null;
+
+        // ===================================================================
+        //  ALERTS
+        // ===================================================================
+        function showAppAlert(msg) {
+            document.getElementById('app-alert-msg').innerText = msg;
+            document.getElementById('app-alert-overlay').style.display = 'flex';
+        }
+
+        let currentConfirmCallback = null;
+
+        function showAppConfirm(msg, callbackYes) {
+            document.getElementById('app-confirm-msg').innerText = msg;
+            currentConfirmCallback = callbackYes;
+            document.getElementById('app-confirm-overlay').style.display = 'flex';
+        }
+
+        function tutupConfirm(isYes) {
+            document.getElementById('app-confirm-overlay').style.display = 'none';
+            if (isYes && currentConfirmCallback) currentConfirmCallback();
+            currentConfirmCallback = null;
+        }
+
+        // ===================================================================
+        //  SIDEBAR / NAV
+        // ===================================================================
+        function toggleSidebarMenu() {
+            const sb = document.getElementById("app-sidebar");
+            sb.classList.toggle("mobile-open");
+            if (window.innerWidth > 768) { sb.classList.toggle("desktop-closed"); }
+        }
+
+        function buildSidebarMenu() {
+            let listHtml = `<li class="active-menu" onclick="gantiSubView('home', this)">⚙️ Beranda</li>`;
+            if (userSession.role === 'Guru') {
+                listHtml += `<li onclick="gantiSubView('guru-topik', this)">📚 Modul</li>`;
+                listHtml += `<li onclick="gantiSubView('guru-penilaian', this)">📝 Koreksi</li>`;
+            } else {
+                listHtml += `<li onclick="gantiSubView('siswa-topik', this)">📚 Modul</li>`;
+                listHtml += `<li onclick="gantiSubView('siswa-rekap', this)">🎓 Rekap Nilai</li>`;
+            }
+            document.getElementById("menu-list").innerHTML = listHtml;
+        }
+
+        function gantiSubView(viewId, elementMenu) {
+            let sidebar = document.getElementById("app-sidebar");
+            if (sidebar.classList.contains("mobile-open")) sidebar.classList.remove("mobile-open");
+
+            document.querySelectorAll(".sub-view").forEach(v => v.style.display = "none");
+            if (viewId === 'home') { document.getElementById("view-home").style.display = "block";
+                document.getElementById("page-title-header").innerText = "Beranda"; }
+            if (viewId === 'guru-topik') { document.getElementById("view-guru-topik").style.display = "block";
+                document.getElementById("page-title-header").innerText = "Kelola Modul"; }
+            if (viewId === 'guru-penilaian') { document.getElementById("view-guru-penilaian").style.display = "block";
+                document.getElementById("page-title-header").innerText = "Koreksi"; }
+            if (viewId === 'siswa-topik') { document.getElementById("view-siswa-topik").style.display = "block";
+                document.getElementById("page-title-header").innerText = "Modul"; }
+            if (viewId === 'siswa-detail-topik') { document.getElementById("view-siswa-detail-topik").style.display =
+                "block";
+                document.getElementById("page-title-header").innerText = "Detail Modul"; }
+
+            if (viewId === 'siswa-rekap') {
+                document.getElementById("view-siswa-rekap").style.display = "block";
+                document.getElementById("page-title-header").innerText = "Rekap Nilai";
+                muatRekapNilaiSiswa();
+            }
+
+            if (elementMenu) {
+                document.querySelectorAll(".sidebar-menu li").forEach(li => li.classList.remove("active-menu"));
+                elementMenu.classList.add("active-menu");
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ===================================================================
+        //  LOGIN / LOGOUT
+        // ===================================================================
+        async function doAppLogin() {
+            let un = document.getElementById("u-name").value;
+            let pw = document.getElementById("u-pass").value;
+            if (!un || !pw) return showAppAlert("Isikan Username dan Password!");
+
+            const btn = document.getElementById("app-login").querySelector(".btn");
+            const oldText = btn.innerText;
+            btn.innerText = "Memproses...";
+            btn.disabled = true;
+
+            try {
+                const res = await callGAS('loginUser', un, pw);
+                if (res.success) {
+                    userSession = res;
+                    document.getElementById("app-login").style.display = "none";
+                    document.getElementById("app-sidebar").classList.add("active-sidebar");
+                    document.getElementById("app-main-content").style.display = "block";
+
+                    buildSidebarMenu();
+
+                    document.getElementById("txt-welcome-nama").innerText = res.nama;
+                    document.getElementById("header-nama").innerText = res.nama;
+                    document.getElementById("header-role").innerText = (res.role === 'Siswa') ? `Siswa - ${res.kelas}` :
+                        `Staf ${res.role}`;
+                    let defaultFoto = "https://ui-avatars.com/api/?name=" + encodeURIComponent(res.nama) +
+                        "&background=e0e7ff&color=4f46e5";
+                    document.getElementById("header-foto").src = res.foto || defaultFoto;
+                    document.getElementById("header-user-info").style.display = "block";
+
+                    document.getElementById("bio-username").value = res.username;
+                    document.getElementById("bio-nama").value = res.nama;
+
+                    if (res.role === 'Siswa') {
+                        document.getElementById("bio-siswa-fields").style.display = "block";
+                        document.getElementById("bio-tingkat").value = res.tingkat;
+                        document.getElementById("bio-kelas").value = res.kelas;
+                    } else {
+                        document.getElementById("bio-siswa-fields").style.display = "none";
+                    }
+
+                    document.getElementById("bio-hp").value = res.hp || "";
+                    document.getElementById("bio-alamat").value = res.alamat || "";
+                    document.getElementById("bio-email").value = res.email || "";
+                    document.getElementById("bio-password").value = "";
+
+                    document.getElementById("profile-pic-preview").src = res.foto || defaultFoto;
+                    currentBase64Foto = null;
+
+                    gantiSubView("home");
+                    await refreshDataLMS();
+                } else {
+                    showAppAlert(res.message);
+                }
+            } catch (err) {
+                showAppAlert("Gagal login: " + err.message);
+            } finally {
+                btn.innerText = oldText;
+                btn.disabled = false;
+            }
+        }
+
+        function doAppLogout() {
+            userSession = null;
+            document.getElementById("app-sidebar").classList.remove("active-sidebar");
+            document.getElementById("app-main-content").style.display = "none";
+            document.getElementById("u-name").value = "";
+            document.getElementById("u-pass").value = "";
+            document.getElementById("app-login").style.display = "block";
+            document.querySelectorAll(".sub-view").forEach(v => v.style.display = "none");
+            // Reset header
+            document.getElementById("header-user-info").style.display = "none";
+            document.getElementById("header-foto").src = "";
+        }
+
+        // ===================================================================
+        //  BIODATA
+        // ===================================================================
+        function previewProfilePic(event) {
+            let file = event.target.files[0];
+            if (!file) return;
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById("profile-pic-preview").src = e.target.result;
+                currentBase64Foto = e.target.result;
+            }
+            reader.readAsDataURL(file);
+        }
+
+        async function simpanBiodata() {
+            let hp = document.getElementById("bio-hp").value;
+            let alamat = document.getElementById("bio-alamat").value;
+            let email = document.getElementById("bio-email").value;
+            let pw = document.getElementById("bio-password").value;
+
+            showAppAlert("Memproses biodata...");
+
+            let fotoUrl = currentBase64Foto && currentBase64Foto.startsWith("data:image") ? null : (userSession.foto ||
+                null);
+
+            if (currentBase64Foto && currentBase64Foto.startsWith("data:image")) {
+                try {
+                    const uploadRes = await callGAS('uploadProfilePicServer', currentBase64Foto, userSession.username);
+                    if (uploadRes.success) {
+                        fotoUrl = uploadRes.url;
+                    } else {
+                        showAppAlert("Gagal upload foto: " + uploadRes.error);
+                        return;
+                    }
+                } catch (err) {
+                    showAppAlert("Gagal upload foto: " + err.message);
+                    return;
+                }
+            }
+
+            try {
+                const msg = await callGAS('updateBiodata', userSession.username, pw, hp, alamat, email, fotoUrl || '');
+                showAppAlert(msg);
+                userSession.hp = hp;
+                userSession.alamat = alamat;
+                userSession.email = email;
+                if (fotoUrl) {
+                    userSession.foto = fotoUrl;
+                    document.getElementById("header-foto").src = fotoUrl;
+                }
+                document.getElementById("bio-password").value = "";
+            } catch (err) {
+                showAppAlert("Gagal simpan biodata: " + err.message);
+            }
+        }
+
+        // ===================================================================
+        //  REFRESH DATA
+        // ===================================================================
+        async function refreshDataLMS() {
+            try {
+                globalTopikList = await callGAS('getDaftarTopik');
+                if (userSession.role === 'Guru') {
+                    renderKartuTopikGuru();
+                    await muatDataNilaiGuru();
+                } else {
+                    renderKartuTopikSiswa();
+                }
+            } catch (err) {
+                showAppAlert("Gagal memuat data: " + err.message);
+            }
+        }
+
+        // ===================================================================
+        //  GURU - TOPIK
+        // ===================================================================
+        function renderKartuTopikGuru() {
+            let cardsHtml = "";
+            globalTopikList.forEach(t => {
+                cardsHtml += `
+              <div class="card" id="guru-card-${t.id}">
+                <div class="topic-header" onclick="toggleCardDetail('${t.id}')">
+                  <h3 style="margin:0; color:var(--primary-blue); font-weight:700; font-size:15px;">
+                    <span class="badge badge-info">${t.tingkat}</span>[${t.id}] ${t.nama}
+                  </h3>
+                  <span style="font-size:11px; color:var(--text-muted); font-weight:600; border:1px solid #cbd5e1; padding:2px 8px; border-radius:4px;">▾</span>
+                </div>
+                <div class="topic-body-detail" id="guru-body-${t.id}">
+                  <div class="flex-wrap mb-2" style="border-bottom:1px solid var(--border-color); padding-bottom:10px;">
+                    <button class="btn-sub-kata" onclick="bukaSubMenuGuru('${t.id}', 'Pre')">Pre-Tes</button>
+                    <button class="btn-sub-kata" onclick="bukaSubMenuGuru('${t.id}', 'Diskusi')">Diskusi</button>
+                    <button class="btn-sub-kata" onclick="bukaSubMenuGuru('${t.id}', 'Materi')">PDF</button>
+                    <button class="btn-sub-kata" onclick="bukaSubMenuGuru('${t.id}', 'Tugas')">Tugas</button>
+                    <button class="btn-sub-kata" onclick="bukaSubMenuGuru('${t.id}', 'Post')">Pos-Tes</button>
+                    <button class="btn-sub-kata" style="color:#ef4444;" onclick="siapkanEditTopikUtama('${t.id}')">✎ Edit</button>
+                    <button class="btn-sub-kata" style="color:#ef4444;" onclick="hapusTopikUtama('${t.id}')">✕</button>
+                  </div>
+                  <div id="container-dynamic-${t.id}" style="padding:10px; background:var(--bg-main); border-radius:8px; min-height:50px; border:1px dashed #cbd5e1;">
+                    <p style="color:var(--text-muted); font-style:italic; font-size:var(--font-small); margin:0; text-align:center; padding:10px 0;">Pilih sub-menu di atas</p>
+                  </div>
+                </div>
+              </div>
+            `;
+            });
+            document.getElementById("list-topik-guru-cards").innerHTML = cardsHtml;
+        }
+
+        function toggleCardDetail(idTopik) {
+            let body = document.getElementById(`guru-body-${idTopik}`);
+            body.style.display = body.style.display === "block" ? "none" : "block";
+        }
+
+        function bukaFormTambahTopikBaru() {
+            document.getElementById('box-form-topik').style.display = 'block';
+            document.getElementById('form-topik-title').innerText = "Buat Modul Baru";
+            document.getElementById('f-topik-is-edit').value = "0";
+            document.getElementById('f-topik-id').value = "";
+            document.getElementById('f-topik-id').readOnly = false;
+            document.getElementById('f-topik-nama').value = "";
+            document.getElementById('f-topik-tingkat').value = "X";
+            document.getElementById('f-topik-rilis').value = "";
+            document.getElementById('f-topik-berakhir').value = "";
+            document.getElementById('f-topik-rilis-pre').value = "";
+            document.getElementById('f-topik-rilis-diskusi').value = "";
+            document.getElementById('f-topik-rilis-materi').value = "";
+            document.getElementById('f-topik-rilis-tugas').value = "";
+            document.getElementById('f-topik-rilis-post').value = "";
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function siapkanEditTopikUtama(idTopik) {
+            let t = globalTopikList.find(x => x.id === idTopik);
+            if (!t) return showAppAlert("Data topik tidak ditemukan.");
+            document.getElementById('box-form-topik').style.display = 'block';
+            document.getElementById('form-topik-title').innerText = "Edit Modul";
+            document.getElementById('f-topik-is-edit').value = "1";
+            document.getElementById('f-topik-id').value = t.id;
+            document.getElementById('f-topik-id').readOnly = true;
+            document.getElementById('f-topik-nama').value = t.nama;
+            document.getElementById('f-topik-tingkat').value = t.tingkat;
+            document.getElementById('f-topik-rilis').value = t.rilis;
+            document.getElementById('f-topik-berakhir').value = t.berakhir;
+            document.getElementById('f-topik-rilis-pre').value = t.rilisPre || "";
+            document.getElementById('f-topik-rilis-diskusi').value = t.rilisDiskusi || "";
+            document.getElementById('f-topik-rilis-materi').value = t.rilisMateri || "";
+            document.getElementById('f-topik-rilis-tugas').value = t.rilisTugas || "";
+            document.getElementById('f-topik-rilis-post').value = t.rilisPost || "";
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        async function hapusTopikUtama(idTopik) {
+            showAppConfirm(`Hapus Modul [${idTopik}]?`, async function() {
+                try {
+                    const msg = await callGAS('hapusTopikDariSheet', idTopik);
+                    showAppAlert(msg);
+                    await refreshDataLMS();
+                } catch (err) {
+                    showAppAlert("Gagal hapus: " + err.message);
+                }
+            });
+        }
+
+        async function prosesSimpanTopik() {
+            let id = document.getElementById('f-topik-id').value;
+            let nama = document.getElementById('f-topik-nama').value;
+            let tingkat = document.getElementById('f-topik-tingkat').value;
+            let rilis = document.getElementById('f-topik-rilis').value;
+            let berakhir = document.getElementById('f-topik-berakhir').value;
+            let rilisPre = document.getElementById('f-topik-rilis-pre').value;
+            let rilisDiskusi = document.getElementById('f-topik-rilis-diskusi').value;
+            let rilisMateri = document.getElementById('f-topik-rilis-materi').value;
+            let rilisTugas = document.getElementById('f-topik-rilis-tugas').value;
+            let rilisPost = document.getElementById('f-topik-rilis-post').value;
+            if (!id || !nama || !rilis || !berakhir) return showAppAlert("Lengkapi semua isian!");
+
+            try {
+                const msg = await callGAS('tambahAtauUpdateTopik', id, nama, tingkat, rilis, berakhir, rilisPre,
+                    rilisDiskusi, rilisMateri, rilisTugas, rilisPost);
+                showAppAlert(msg);
+                document.getElementById('box-form-topik').style.display = 'none';
+                await refreshDataLMS();
+            } catch (err) {
+                showAppAlert("Gagal simpan: " + err.message);
+            }
+        }
+
+        // ===================================================================
+        //  GURU - SUB MENU (Materi, Diskusi, Tugas, Soal)
+        // ===================================================================
+        function bukaSubMenuGuru(idTopik, tipe) {
+            let container = document.getElementById(`container-dynamic-${idTopik}`);
+            let topikObj = globalTopikList.find(x => x.id === idTopik);
+
+            if (tipe === 'Materi') {
+                container.innerHTML = `
+              <h4 style="margin-top:0; font-size:14px;">URL PDF</h4>
+              <input type="text" id="inp-materi-${idTopik}" value="${topikObj.pdf || ''}" placeholder="URL Google Drive...">
+              <button class="btn" style="font-size:var(--font-small);" onclick="simpanSatuElemenGuru('${idTopik}', 'Materi')">Simpan URL</button>
+            `;
+            } else if (tipe === 'Diskusi' || tipe === 'Tugas') {
+                let arr = tipe === 'Diskusi' ? topikObj.diskusi : topikObj.tugas;
+                let htmlList = `
+              <h4 style="margin-top:0; font-size:14px; font-weight:700;">${tipe}</h4>
+              <div id="list-${tipe}-${idTopik}">
+            `;
+
+                if (arr && arr.length > 0) {
+                    arr.forEach((item, index) => {
+                        htmlList += `
+                  <div style="background:var(--card-white); padding:10px 14px; margin-bottom:8px; border-radius:8px; border:1px solid var(--border-color); font-size:var(--font-small);">
+                    <p style="margin:0; font-weight:600; white-space:pre-wrap;">${index+1}. ${item}</p>
+                    <div class="flex-wrap gap-1" style="margin-top:6px;">
+                      <button class="btn btn-secondary" style="padding:4px 10px; font-size:11px;" onclick="editItemArrayGuru('${idTopik}', '${tipe}', ${index})">Edit</button>
+                      <button class="btn btn-danger" style="padding:4px 10px; font-size:11px;" onclick="hapusItemArrayGuru('${idTopik}', '${tipe}', ${index})">Hapus</button>
+                    </div>
+                  </div>
+                `;
+                    });
+                } else {
+                    htmlList +=
+                        `<p style="color:var(--text-muted); font-style:italic; font-size:var(--font-small); text-align:center; padding:12px;">Belum ada data.</p>`;
+                }
+
+                htmlList += `
+              </div>
+              <div style="background:#e0e7ff; padding:14px; border-radius:8px; margin-top:12px; border:1px solid #c7d2fe;">
+                <h5 style="margin-top:0; font-size:13px; color:var(--primary-blue);" id="lbl-form-${tipe}-${idTopik}">+ Tambah Item</h5>
+                <input type="hidden" id="edit-idx-${tipe}-${idTopik}">
+                <textarea id="inp-item-${tipe}-${idTopik}" rows="2" placeholder="Ketik instruksi..."></textarea>
+                <div class="flex-wrap gap-1">
+                  <button class="btn" style="font-size:var(--font-small);" onclick="simpanItemArrayGuru('${idTopik}', '${tipe}')">Simpan</button>
+                  <button class="btn btn-secondary" style="font-size:var(--font-small);" onclick="resetFormArrayGuru('${idTopik}', '${tipe}')">Batal</button>
+                </div>
+              </div>
+            `;
+                container.innerHTML = htmlList;
+            } else {
+                // Pre / Post -> bank soal
+                container.innerHTML = `<h4 style="margin-top:0; font-size:14px;">Memuat bank soal...</h4>`;
+                muatBankSoalGuru(idTopik, tipe, container);
+            }
+        }
+
+        async function muatBankSoalGuru(idTopik, tipe, container) {
+            try {
+                const soalList = await callGAS('getSoalGuru', idTopik, tipe);
+                temporarySoalListGuru = soalList;
+                let html = `<h4 style="margin-top:0; color:var(--primary-blue); font-weight:700; font-size:14px;">Bank Soal ${tipe}-Tes</h4>`;
+                if (soalList.length === 0) {
+                    html += `<p style="color:var(--text-muted); font-style:italic; font-size:var(--font-small);">Belum ada soal.</p>`;
+                } else {
+                    soalList.forEach((s, idx) => {
+                        html += `
+                  <div style="background:var(--card-white); padding:12px 16px; margin-bottom:10px; border-radius:8px; border:1px solid var(--border-color); font-size:var(--font-small);">
+                    <p style="margin-top:0; font-weight:600; font-size:14px;">${idx+1}. ${s.pertanyaan}</p>
+                    <div style="font-size:var(--font-small); color:var(--text-muted); line-height:1.6; margin-bottom:8px;">
+                      <div><b>A.</b> ${s.a}</div>
+                      <div><b>B.</b> ${s.b}</div>
+                      <div><b>C.</b> ${s.c}</div>
+                      <div><b>D.</b> ${s.d}</div>
+                      <div><b>E.</b> ${s.e}</div>
+                    </div>
+                    <div class="flex-between">
+                      <div style="color:#059669; font-weight:700; font-size:12px; background:#d1fae5; padding:2px 10px; border-radius:4px;">Kunci: ${s.kunci}</div>
+                      <div class="flex-wrap gap-1">
+                        <button class="btn btn-secondary" style="padding:4px 10px; font-size:11px;" onclick="siapkanEditSoalGuru(${s.rowNum}, '${idTopik}', '${tipe}')">Edit</button>
+                        <button class="btn btn-danger" style="padding:4px 10px; font-size:11px;" onclick="hapusSoalGuruDariMuka(${s.rowNum}, '${idTopik}', '${tipe}')">Hapus</button>
+                      </div>
+                    </div>
+                  </div>
+                `;
+                    });
+                }
+                html += `
+              <div style="background:#e0e7ff; padding:16px; border-radius:8px; margin-top:16px; border:1px solid #c7d2fe;">
+                <h4 style="margin-top:0; font-size:13px; color:var(--primary-blue);" id="lbl-form-${idTopik}">+ Tambah Soal</h4>
+                <input type="hidden" id="edit-row-${idTopik}">
+                <label style="font-size:11px;">Pertanyaan</label>
+                <textarea id="add-q-${idTopik}" rows="2"></textarea>
+                <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                  <div style="flex:1; min-width:120px;"><label style="font-size:10px;">A</label><input type="text" id="add-a-${idTopik}" style="font-size:var(--font-small);"></div>
+                  <div style="flex:1; min-width:120px;"><label style="font-size:10px;">B</label><input type="text" id="add-b-${idTopik}" style="font-size:var(--font-small);"></div>
+                  <div style="flex:1; min-width:120px;"><label style="font-size:10px;">C</label><input type="text" id="add-c-${idTopik}" style="font-size:var(--font-small);"></div>
+                </div>
+                <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                  <div style="flex:1; min-width:120px;"><label style="font-size:10px;">D</label><input type="text" id="add-d-${idTopik}" style="font-size:var(--font-small);"></div>
+                  <div style="flex:1; min-width:120px;"><label style="font-size:10px;">E</label><input type="text" id="add-e-${idTopik}" style="font-size:var(--font-small);"></div>
+                  <div style="flex:1; min-width:120px;">
+                    <label style="font-size:10px;">Kunci</label>
+                    <select id="add-kunci-${idTopik}" style="font-size:var(--font-small);">
+                      <option value="A">A</option><option value="B">B</option><option value="C">C</option>
+                      <option value="D">D</option><option value="E">E</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="flex-wrap gap-1" style="margin-top:8px;">
+                  <button class="btn" style="font-size:var(--font-small);" onclick="tambahAtauEditSoalGuruDariMuka('${idTopik}', '${tipe}')">Simpan</button>
+                  <button class="btn btn-secondary" style="font-size:var(--font-small);" onclick="resetFormSoal('${idTopik}')">Reset</button>
+                </div>
+              </div>
+            `;
+                container.innerHTML = html;
+            } catch (err) {
+                container.innerHTML = `<p style="color:#ef4444;">Gagal muat soal: ${err.message}</p>`;
+            }
+        }
+
+        async function simpanSatuElemenGuru(idTopik, tipe) {
+            let val = document.getElementById(`inp-materi-${idTopik}`).value;
+            try {
+                const msg = await callGAS('updateElementTopikSpesifik', idTopik, tipe, val);
+                showAppAlert(msg);
+                await refreshDataLMS();
+            } catch (err) {
+                showAppAlert("Gagal simpan: " + err.message);
+            }
+        }
+
+        async function simpanItemArrayGuru(idTopik, tipe) {
+            let topikObj = globalTopikList.find(x => x.id === idTopik);
+            if (!topikObj) return showAppAlert("Topik tidak ditemukan.");
+            let arr = tipe === 'Diskusi' ? topikObj.diskusi : topikObj.tugas;
+            if (!arr) arr = [];
+
+            let val = document.getElementById(`inp-item-${tipe}-${idTopik}`).value;
+            let editIdx = document.getElementById(`edit-idx-${tipe}-${idTopik}`).value;
+
+            if (!val.trim()) return showAppAlert("Isian tidak boleh kosong.");
+
+            if (editIdx !== "") {
+                arr[parseInt(editIdx)] = val;
+            } else {
+                arr.push(val);
+            }
+
+            if (tipe === 'Diskusi') topikObj.diskusi = arr;
+            else topikObj.tugas = arr;
+
+            try {
+                const msg = await callGAS('updateElementTopikSpesifik', idTopik, tipe, JSON.stringify(arr));
+                showAppAlert(msg);
+                bukaSubMenuGuru(idTopik, tipe);
+            } catch (err) {
+                showAppAlert("Gagal simpan: " + err.message);
+            }
+        }
+
+        async function hapusItemArrayGuru(idTopik, tipe, index) {
+            showAppConfirm("Hapus item ini?", async function() {
+                let topikObj = globalTopikList.find(x => x.id === idTopik);
+                let arr = tipe === 'Diskusi' ? topikObj.diskusi : topikObj.tugas;
+                arr.splice(index, 1);
+                try {
+                    const msg = await callGAS('updateElementTopikSpesifik', idTopik, tipe, JSON.stringify(arr));
+                    showAppAlert(msg);
+                    bukaSubMenuGuru(idTopik, tipe);
+                } catch (err) {
+                    showAppAlert("Gagal hapus: " + err.message);
+                }
+            });
+        }
+
+        function editItemArrayGuru(idTopik, tipe, index) {
+            let topikObj = globalTopikList.find(x => x.id === idTopik);
+            let arr = tipe === 'Diskusi' ? topikObj.diskusi : topikObj.tugas;
+            document.getElementById(`inp-item-${tipe}-${idTopik}`).value = arr[index];
+            document.getElementById(`edit-idx-${tipe}-${idTopik}`).value = index;
+            document.getElementById(`lbl-form-${tipe}-${idTopik}`).innerText = "[EDIT] Item " + (index + 1);
+            window.scrollTo({ top: document.getElementById(`lbl-form-${tipe}-${idTopik}`).offsetTop, behavior: 'smooth' });
+        }
+
+        function resetFormArrayGuru(idTopik, tipe) {
+            document.getElementById(`inp-item-${tipe}-${idTopik}`).value = "";
+            document.getElementById(`edit-idx-${tipe}-${idTopik}`).value = "";
+            document.getElementById(`lbl-form-${tipe}-${idTopik}`).innerText = "+ Tambah Item";
+        }
+
+        function siapkanEditSoalGuru(rowNum, idTopik, tipe) {
+            let soalObj = temporarySoalListGuru.find(s => s.rowNum === rowNum);
+            if (!soalObj) return;
+            document.getElementById(`lbl-form-${idTopik}`).innerText = "[EDIT] Baris " + rowNum;
+            document.getElementById(`edit-row-${idTopik}`).value = rowNum;
+            document.getElementById(`add-q-${idTopik}`).value = soalObj.pertanyaan;
+            document.getElementById(`add-a-${idTopik}`).value = soalObj.a;
+            document.getElementById(`add-b-${idTopik}`).value = soalObj.b;
+            document.getElementById(`add-c-${idTopik}`).value = soalObj.c;
+            document.getElementById(`add-d-${idTopik}`).value = soalObj.d;
+            document.getElementById(`add-e-${idTopik}`).value = soalObj.e;
+            document.getElementById(`add-kunci-${idTopik}`).value = soalObj.kunci;
+            window.scrollTo({ top: document.getElementById(`lbl-form-${idTopik}`).offsetTop, behavior: 'smooth' });
+        }
+
+        function resetFormSoal(idTopik) {
+            document.getElementById(`lbl-form-${idTopik}`).innerText = "+ Tambah Soal";
+            document.getElementById(`edit-row-${idTopik}`).value = "";
+            document.getElementById(`add-q-${idTopik}`).value = "";
+            document.getElementById(`add-a-${idTopik}`).value = "";
+            document.getElementById(`add-b-${idTopik}`).value = "";
+            document.getElementById(`add-c-${idTopik}`).value = "";
+            document.getElementById(`add-d-${idTopik}`).value = "";
+            document.getElementById(`add-e-${idTopik}`).value = "";
+            document.getElementById(`add-kunci-${idTopik}`).value = "A";
+        }
+
+        async function tambahAtauEditSoalGuruDariMuka(idTopik, tipe) {
+            let editRowNum = document.getElementById(`edit-row-${idTopik}`).value;
+            let q = document.getElementById(`add-q-${idTopik}`).value;
+            let a = document.getElementById(`add-a-${idTopik}`).value;
+            let b = document.getElementById(`add-b-${idTopik}`).value;
+            let c = document.getElementById(`add-c-${idTopik}`).value;
+            let d = document.getElementById(`add-d-${idTopik}`).value;
+            let e = document.getElementById(`add-e-${idTopik}`).value;
+            let kunci = document.getElementById(`add-kunci-${idTopik}`).value;
+
+            if (!q || !a || !b || !c || !d || !e) return showAppAlert("Semua opsi harus diisi!");
+
+            try {
+                let msg;
+                if (editRowNum) {
+                    msg = await callGAS('editSoalGuruBerdasarkanRow', parseInt(editRowNum), idTopik, tipe, q, a, b, c, d, e,
+                        kunci);
+                } else {
+                    msg = await callGAS('tambahSoalGuru', idTopik, tipe, q, a, b, c, d, e, kunci);
+                }
+                showAppAlert(msg);
+                bukaSubMenuGuru(idTopik, tipe);
+            } catch (err) {
+                showAppAlert("Gagal simpan soal: " + err.message);
+            }
+        }
+
+        async function hapusSoalGuruDariMuka(rowNum, idTopik, tipe) {
+            showAppConfirm("Hapus soal ini?", async function() {
+                try {
+                    const msg = await callGAS('hapusSoalGuruBerdasarkanRow', rowNum);
+                    showAppAlert(msg);
+                    bukaSubMenuGuru(idTopik, tipe);
+                } catch (err) {
+                    showAppAlert("Gagal hapus: " + err.message);
+                }
+            });
+        }
+
+        // ===================================================================
+        //  GURU - PENILAIAN
+        // ===================================================================
+        async function muatDataNilaiGuru() {
+            try {
+                databaseNilaiGuru = await callGAS('getNilaiSiswaForGuru');
+                renderNilaiGuruKhusus();
+            } catch (err) {
+                showAppAlert("Gagal muat nilai: " + err.message);
+            }
+        }
+
+        function toggleNilaiGroup(id) {
+            let el = document.getElementById(id);
+            if (el) el.style.display = el.style.display === "none" ? "block" : "none";
+        }
+
+        function renderNilaiGuruKhusus() {
+            let fTingkat = document.getElementById("f-nilai-tingkat").value.toUpperCase();
+            let fKelas = document.getElementById("f-nilai-kelas").value.toLowerCase();
+
+            let html = "";
+            globalTopikList.forEach((topik) => {
+                let siswaPerKelas = {};
+                let countTopik = 0;
+
+                databaseNilaiGuru.forEach(row => {
+                    if (row.idTopik !== topik.id) return;
+                    if (fTingkat && row.tingkat !== fTingkat) return;
+                    if (fKelas && !row.kelas.toLowerCase().includes(fKelas)) return;
+
+                    if (!siswaPerKelas[row.kelas]) {
+                        siswaPerKelas[row.kelas] = [];
+                    }
+                    siswaPerKelas[row.kelas].push(row);
+                    countTopik++;
+                });
+
+                if (countTopik === 0) return;
+
+                html += `
+              <div class="card" style="padding:0; overflow:hidden; border:1px solid var(--border-color); margin-bottom:12px;">
+                <div style="background:var(--primary-blue); color:white; padding:10px 16px; cursor:pointer; display:flex; justify-content:space-between; align-items:center;" onclick="toggleNilaiGroup('topik-group-${topik.id}')">
+                   <h3 style="margin:0; font-weight:700; font-size:14px;">📚 [${topik.id}] ${topik.nama}</h3>
+                   <span style="font-size:11px; background:rgba(255,255,255,0.2); padding:2px 10px; border-radius:4px;">${countTopik} data</span>
+                </div>
+                <div id="topik-group-${topik.id}" style="display:none; padding:14px 16px; background:var(--bg-main);">
+            `;
+
+                for (let kelasName in siswaPerKelas) {
+                    let rows = siswaPerKelas[kelasName];
+                    let idKelasSate = `kelas-${topik.id}-${kelasName.replace(/\s+/g, '-')}`;
+
+                    html += `
+                <div style="margin-bottom:10px; border:1px solid #cbd5e1; border-radius:8px; overflow:hidden; background:var(--card-white);">
+                  <div style="background:#e0e7ff; padding:8px 14px; cursor:pointer; font-weight:700; color:var(--primary-blue); border-bottom:1px solid #cbd5e1; display:flex; justify-content:space-between; font-size:var(--font-small);" onclick="toggleNilaiGroup('${idKelasSate}')">
+                     <span>📁 ${kelasName}</span>
+                     <span style="font-size:11px; color:var(--text-muted);">(${rows.length} siswa)</span>
+                  </div>
+                  <div id="${idKelasSate}" style="display:none; padding:12px 14px;">
+              `;
+
+                    rows.forEach(row => {
+                        let jwbArr = [];
+                        try { jwbArr = JSON.parse(row.jawabanDiskusi); } catch (e) { jwbArr = row
+                            .jawabanDiskusi ? [row.jawabanDiskusi] : []; }
+                        let htmlDsk = jwbArr.length > 0 ? jwbArr.map((j, idx) =>
+                            `<b>${idx+1}:</b> ${j}`).join('<br>') : "Belum menjawab";
+
+                        let linkObj = {};
+                        try { linkObj = JSON.parse(row.linkTugas); } catch (e) { linkObj = row.linkTugas ? { "0": row
+                                .linkTugas } : {}; }
+                        let keysObj = Object.keys(linkObj);
+
+                        let htmlLnk = keysObj.map(k =>
+                            `<a href="${linkObj[k]}" target="_blank" style="color:var(--primary-blue);">📎 ${parseInt(k)+1}</a>`
+                            ).join(' ');
+
+                        html += `
+                  <div class="nested-student-card" style="margin-bottom:10px; border-left:3px solid var(--primary-blue); font-size:var(--font-small);">
+                    <div style="font-weight:700; font-size:14px;">${row.nama}</div>
+                    <div style="display:flex; flex-wrap:wrap; gap:12px; margin-top:6px;">
+                      <div style="flex:1; min-width:200px; background:var(--bg-main); padding:8px 12px; border-radius:6px;">
+                        <span class="badge badge-success" style="font-size:10px;">Diskusi</span>
+                        <div style="font-size:12px; max-height:60px; overflow-y:auto;">${htmlDsk}</div>
+                        <div class="flex-wrap gap-1" style="margin-top:4px;">
+                          <input type="text" id="g-nd-${row.rowNum}" value="${row.nilaiDiskusi || ''}" style="width:70px; padding:4px 6px; font-size:12px; margin:0; text-align:center;">
+                          <button class="btn" style="padding:4px 10px; font-size:11px;" onclick="simpanNilaiEsai(${row.rowNum}, 'diskusi')">Simpan</button>
+                        </div>
+                      </div>
+                      <div style="flex:1; min-width:200px; background:var(--bg-main); padding:8px 12px; border-radius:6px;">
+                        <span class="badge badge-info" style="font-size:10px;">Tugas</span>
+                        <div style="font-size:12px;">${htmlLnk || "Belum unggah"}</div>
+                        <div class="flex-wrap gap-1" style="margin-top:4px;">
+                          <input type="text" id="g-nt-${row.rowNum}" value="${row.nilaiTugas || ''}" style="width:70px; padding:4px 6px; font-size:12px; margin:0; text-align:center;">
+                          <button class="btn" style="padding:4px 10px; font-size:11px;" onclick="simpanNilaiEsai(${row.rowNum}, 'tugas')">Simpan</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                `;
+                    });
+
+                    html += `</div></div>`;
+                }
+
+                html += `</div></div>`;
+            });
+
+            if (html === "") {
+                html =
+                    `<p style="color:var(--text-muted); font-style:italic; padding:16px; text-align:center;">Tidak ada data siswa yang cocok.</p>`;
+            }
+            document.getElementById("list-penilaian-guru").innerHTML = html;
+        }
+
+        async function simpanNilaiEsai(rowNum, colType) {
+            let skor = colType === 'diskusi' ? document.getElementById(`g-nd-${rowNum}`).value : document.getElementById(
+                `g-nt-${rowNum}`).value;
+            try {
+                const msg = await callGAS('simpanNilaiEsaiDariGuru', rowNum, colType, skor);
+                showAppAlert(msg);
+            } catch (err) {
+                showAppAlert("Gagal simpan nilai: " + err.message);
+            }
+        }
+
+        // ===================================================================
+        //  SISWA - TOPIK
+        // ===================================================================
+        function waktuSudahRilis(waktuStr) {
+            if (!waktuStr) return true;
+            let target = new Date(waktuStr.replace(" ", "T"));
+            if (isNaN(target.getTime())) return true;
+            return new Date() >= target;
+        }
+
+        function waktuRilisSub(t, field) {
+            return t[field] || t.rilis;
+        }
+
+        function renderKartuTopikSiswa() {
+            let cardsHtml = "";
+            globalTopikList.forEach(t => {
+                if (t.tingkat !== "Umum" && t.tingkat !== userSession.tingkat) return;
+
+                let sudahRilis = waktuSudahRilis(t.rilis);
+
+                if (!sudahRilis) {
+                    cardsHtml += `
+                <div class="card" style="opacity:0.7; background:#f1f5f9;">
+                  <div class="flex-between">
+                     <h3 style="margin:0; color:var(--text-muted); font-weight:700; font-size:15px;">🔒 [${t.id}] ${t.nama}</h3>
+                     <span style="font-size:11px; font-weight:600; background:#e2e8f0; color:var(--text-muted); padding:2px 10px; border-radius:4px;">Terkunci</span>
+                  </div>
+                  <div style="color:var(--text-muted); font-size:var(--font-small); margin:10px 0; background:var(--card-white); padding:10px; border-radius:6px;">
+                    <div class="flex-between">
+                       <span>🕒 Buka: <b>${t.rilis.replace("T", " ")}</b></span>
+                       <span>⛔ Tutup: <b>${t.berakhir.replace("T", " ")}</b></span>
+                    </div>
+                  </div>
+                  <button class="btn w-full" style="background:#94a3b8; cursor:not-allowed;" disabled>🔒 Terkunci</button>
+                </div>
+              `;
+                    return;
+                }
+
+                cardsHtml += `
+              <div class="card" style="cursor:pointer;" onclick="bukaDetailTopikSiswa('${t.id}')">
+                <div class="flex-between">
+                   <h3 style="margin:0; font-weight:700; font-size:15px;">[${t.id}] ${t.nama}</h3>
+                   <span style="font-size:11px; font-weight:600; background:#e0e7ff; color:var(--primary-blue); padding:2px 10px; border-radius:4px;">Tersedia</span>
+                </div>
+                <div style="color:var(--text-muted); font-size:var(--font-small); margin:10px 0; background:var(--bg-main); padding:10px; border-radius:6px;">
+                  <div class="flex-between">
+                     <span>🕒 Buka: <b>${t.rilis.replace("T", " ")}</b></span>
+                     <span>⛔ Tutup: <b>${t.berakhir.replace("T", " ")}</b></span>
+                  </div>
+                </div>
+                <button class="btn w-full" style="font-size:var(--font-small);">Masuk</button>
+              </div>
+            `;
+            });
+            document.getElementById("list-topik-siswa-cards").innerHTML = cardsHtml ||
+                "<div style='text-align:center; padding:30px; color:var(--text-muted);'>Tidak ada modul tersedia.</div>";
+        }
+
+        async function refreshAttemptStatusSiswa() {
+            try {
+                const status = await callGAS('getStatusSiswaTopik', userSession.username, currentActiveTopikId);
+                studentTopicStatus = status;
+                let t = globalTopikList.find(x => x.id === currentActiveTopikId);
+
+                let sisaPre = 3 - status.preAttempts;
+                document.getElementById("info-pre-attempts").innerHTML =
+                    `Skor: <b>${status.preScore !== "" ? status.preScore : "N/A"}</b> | Sisa: <b>${sisaPre}</b>`;
+                if (!waktuSudahRilis(waktuRilisSub(t, "rilisPre"))) {
+                    document.getElementById("btn-siswa-pre").disabled = true;
+                    document.getElementById("btn-siswa-pre").innerText = `🔒 ${waktuRilisSub(t, "rilisPre").replace("T", " ")}`;
+                } else if (sisaPre <= 0) {
+                    document.getElementById("btn-siswa-pre").disabled = true;
+                    document.getElementById("btn-siswa-pre").innerText = "Selesai";
+                } else {
+                    document.getElementById("btn-siswa-pre").disabled = false;
+                    document.getElementById("btn-siswa-pre").innerText = "Mulai Pre-Tes";
+                }
+
+                let sisaPost = 1 - status.postAttempts;
+                document.getElementById("info-post-attempts").innerHTML =
+                    `Skor: <b>${status.postScore !== "" ? status.postScore : "N/A"}</b> | Sisa: <b>${sisaPost}</b>`;
+                if (!waktuSudahRilis(waktuRilisSub(t, "rilisPost"))) {
+                    document.getElementById("btn-siswa-post").disabled = true;
+                    document.getElementById("btn-siswa-post").innerText = `🔒 ${waktuRilisSub(t, "rilisPost").replace("T", " ")}`;
+                } else if (sisaPost <= 0) {
+                    document.getElementById("btn-siswa-post").disabled = true;
+                    document.getElementById("btn-siswa-post").innerText = "Selesai";
+                } else {
+                    document.getElementById("btn-siswa-post").disabled = false;
+                    document.getElementById("btn-siswa-post").innerText = "Mulai Pos-Tes";
+                }
+
+                renderMultiDiskusiDanTugasSiswa();
+            } catch (err) {
+                showAppAlert("Gagal refresh status: " + err.message);
+            }
+        }
+
+        function bukaDetailTopikSiswa(idTopik) {
+            let t = globalTopikList.find(x => x.id === idTopik);
+
+            if (!waktuSudahRilis(t.rilis)) {
+                showAppAlert(`🔒 Modul [${t.id}] terkunci hingga: ${t.rilis.replace("T", " ")}`);
+                return;
+            }
+
+            currentActiveTopikId = idTopik;
+            document.getElementById("s-detail-title").innerText = `[${t.id}] ${t.nama}`;
+
+            let btnPdf = document.getElementById("btn-siswa-pdf");
+            if (waktuSudahRilis(waktuRilisSub(t, "rilisMateri"))) {
+                btnPdf.href = t.pdf ? t.pdf : "#";
+                btnPdf.style.pointerEvents = "auto";
+                btnPdf.style.opacity = "1";
+                btnPdf.innerText = "Buka PDF";
+            } else {
+                btnPdf.href = "javascript:void(0)";
+                btnPdf.style.pointerEvents = "none";
+                btnPdf.style.opacity = "0.5";
+                btnPdf.innerText = `🔒 ${waktuRilisSub(t, "rilisMateri").replace("T", " ")}`;
+            }
+
+            refreshAttemptStatusSiswa();
+            muatUlangForumKelasSiswa();
+
+            gantiSubView('siswa-detail-topik');
+        }
+
+        // ===================================================================
+        //  SISWA - DISKUSI & TUGAS
+        // ===================================================================
+        function renderMultiDiskusiDanTugasSiswa() {
+            let t = globalTopikList.find(x => x.id === currentActiveTopikId);
+
+            if (!waktuSudahRilis(waktuRilisSub(t, "rilisDiskusi"))) {
+                document.getElementById("dynamic-diskusi-forms").innerHTML =
+                    `<p style='color:var(--text-muted); font-weight:600; padding:12px; background:var(--bg-main); border-radius:6px; text-align:center; font-size:var(--font-small);'>🔒 Diskusi dibuka: ${waktuRilisSub(t, "rilisDiskusi").replace("T", " ")}</p>`;
+            } else {
+                renderFormDiskusiSiswa(t);
+            }
+
+            if (!waktuSudahRilis(waktuRilisSub(t, "rilisTugas"))) {
+                document.getElementById("dynamic-tugas-forms").innerHTML =
+                    `<p style='color:var(--text-muted); font-weight:600; padding:12px; background:var(--bg-main); border-radius:6px; text-align:center; font-size:var(--font-small);'>🔒 Tugas dibuka: ${waktuRilisSub(t, "rilisTugas").replace("T", " ")}</p>`;
+            } else {
+                renderFormTugasSiswa(t);
+            }
+        }
+
+        function renderFormDiskusiSiswa(t) {
+            let htmlDiskusi = "";
+            if (t.diskusi && t.diskusi.length > 0) {
+                t.diskusi.forEach((soal, idx) => {
+                    let valueSejarah = (studentTopicStatus.jawabanDiskusiArr && studentTopicStatus
+                        .jawabanDiskusiArr[idx]) ? studentTopicStatus.jawabanDiskusiArr[idx] : "";
+                    htmlDiskusi += `
+                <div style="margin-bottom:12px; border-bottom:1px solid var(--border-color); padding-bottom:12px;">
+                   <label style="font-weight:700; font-size:13px; color:var(--primary-blue);">Soal ${idx+1}:</label>
+                   <p style="margin:6px 0 10px 0; font-size:var(--font-small); background:var(--bg-main); padding:10px; border-radius:6px;">${soal}</p>
+                   <textarea id="s-diskusi-form-${idx}" rows="3" placeholder="Tulis jawaban..." style="font-size:var(--font-small);">${valueSejarah}</textarea>
+                </div>
+              `;
+                });
+                htmlDiskusi +=
+                    `<button class="btn w-full" style="padding:8px; font-size:var(--font-small);" onclick="kirimMultiDiskusiSiswa()">Kirim Jawaban</button>`;
+            } else {
+                htmlDiskusi =
+                    "<p style='color:var(--text-muted); font-style:italic; padding:12px; background:var(--bg-main); border-radius:6px; text-align:center;'>Belum ada soal diskusi.</p>";
+            }
+            document.getElementById("dynamic-diskusi-forms").innerHTML = htmlDiskusi;
+        }
+
+        // ===================================================================
+        //  SISWA - TUGAS (dengan kelompok)
+        // ===================================================================
+        async function renderFormTugasSiswa(t) {
+            try {
+                const groupInfo = await callGAS('getGroupInfoForTopic', currentActiveTopikId, userSession.username);
+                currentGroupInfo = groupInfo;
+                let html = "";
+                if (t.tugas && t.tugas.length > 0) {
+                    t.tugas.forEach((instruksi, idx) => {
+                        html += `<div class="task-container" id="task-container-${idx}">`;
+                        html +=
+                            `<label style="font-weight:700; color:var(--primary-blue); font-size:13px;">Tugas ${idx+1}:</label>`;
+                        html +=
+                            `<p style="margin:6px 0 10px 0; font-size:var(--font-small); white-space:pre-wrap;">${instruksi}</p>`;
+
+                        let fileUrl = null;
+                        if (groupInfo && groupInfo.fileURLs) {
+                            fileUrl = groupInfo.fileURLs[idx] || null;
+                        } else if (studentTopicStatus && studentTopicStatus.linkTugasObj) {
+                            fileUrl = studentTopicStatus.linkTugasObj[idx] || null;
+                        }
+
+                        if (fileUrl) {
+                            html +=
+                                `<a href="${fileUrl}" target="_blank" style="color:#059669; font-weight:600; display:block; margin-top:6px; background:#d1fae5; padding:6px 10px; border-radius:4px; font-size:var(--font-small); text-decoration:none;">✅ File terupload</a>`;
+
+                            if (groupInfo) {
+                                let isLeader = (groupInfo.leader === userSession.username);
+                                let memberNames = groupInfo.members.map(m => m.nama).join(', ');
+                                let leaderName = groupInfo.leaderNama || groupInfo.leader;
+                                html += `
+                          <div class="group-info-box">
+                            <div><span style="font-weight:700;">👥 Kelompok:</span> ${groupInfo.groupName}</div>
+                            <div><span class="leader-name">👤 Ketua:</span> ${leaderName}</div>
+                            <div class="member-list">👥 Anggota: ${memberNames}</div>
+                            <div style="margin-top:8px; display:flex; justify-content:flex-end;">
+                              <button class="btn btn-warning" style="padding:4px 12px; font-size:11px;" onclick="keluarDariKelompok()">🚪 Keluar Kelompok</button>
+                            </div>
+                          </div>
+                        `;
+                            } else {
+                                html += `
+                          <div class="group-info-box" style="background:#d1fae5; border-color:#059669;">
+                            <div style="font-weight:700; color:#065f46;">✅ Anda mengerjakan secara individu.</div>
+                          </div>
+                        `;
+                            }
+
+                            html += `
+                        <div style="margin-top:10px;">
+                          <input type="file" id="s-tugas-file-${idx}" style="display:block; margin-bottom:8px; font-size:12px; width:100%; border:none; padding:0;" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.zip,.rar">
+                          <button class="btn btn-secondary w-full" style="padding:6px; font-size:var(--font-small);" onclick="uploadTugasEdit(${idx})">Edit/Upload Ulang</button>
+                        </div>
+                      `;
+                        } else {
+                            if (groupInfo) {
+                                let isLeader = (groupInfo.leader === userSession.username);
+                                let memberNames = groupInfo.members.map(m => m.nama).join(', ');
+                                let leaderName = groupInfo.leaderNama || groupInfo.leader;
+                                html += `
+                          <div class="group-info-box">
+                            <div><span style="font-weight:700;">👥 Kelompok:</span> ${groupInfo.groupName}</div>
+                            <div><span class="leader-name">👤 Ketua:</span> ${leaderName}</div>
+                            <div class="member-list">👥 Anggota: ${memberNames}</div>
+                            ${isLeader ? `
+                              <div style="margin-top:8px;">
+                                <input type="file" id="s-tugas-file-${idx}" style="display:block; margin-bottom:8px; font-size:12px; width:100%; border:none; padding:0;" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.zip,.rar">
+                                <button class="btn btn-secondary w-full" style="padding:6px; font-size:var(--font-small);" onclick="uploadTugasEdit(${idx})">Upload Tugas</button>
+                              </div>
+                            ` : `
+                              <div style="margin-top:8px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                                <span style="color:var(--text-muted); font-style:italic; font-size:var(--font-small);">🔒 Hanya ketua yang dapat mengupload pertama kali.</span>
+                                <button class="btn btn-warning" style="padding:4px 12px; font-size:11px;" onclick="keluarDariKelompok()">🚪 Keluar Kelompok</button>
+                              </div>
+                            `}
+                          </div>
+                        `;
+                            } else {
+                                html += `
+                          <div style="margin-top:8px;">
+                            <div class="choice-container" id="choice-container-${idx}">
+                              <button class="btn" style="background:#22c55e;" onclick="pilihIndividu(${idx})">👤 Individu</button>
+                              <button class="btn" style="background:#3b82f6;" onclick="pilihKelompok(${idx})">👥 Kelompok</button>
+                            </div>
+                          </div>
+                          <div id="upload-area-${idx}" style="margin-top:10px;"></div>
+                        `;
+                            }
+                        }
+
+                        html += `</div>`;
+                    });
+                } else {
+                    html =
+                        "<p style='color:var(--text-muted); font-style:italic; padding:12px; background:var(--bg-main); border-radius:6px; text-align:center;'>Belum ada tugas.</p>";
+                }
+                document.getElementById("dynamic-tugas-forms").innerHTML = html;
+            } catch (err) {
+                document.getElementById("dynamic-tugas-forms").innerHTML =
+                    `<p style="color:#ef4444;">Gagal memuat tugas: ${err.message}</p>`;
+            }
+        }
+
+        // --- Fungsi Keluar Kelompok ---
+        async function keluarDariKelompok() {
+            showAppConfirm("Anda yakin ingin keluar dari kelompok ini? File tugas Anda akan dihapus.", async function() {
+                try {
+                    const msg = await callGAS('leaveGroupAdvanced', currentActiveTopikId, userSession.username);
+                    showAppAlert(msg);
+                    let t = globalTopikList.find(x => x.id === currentActiveTopikId);
+                    await renderFormTugasSiswa(t);
+                    await refreshDataLMS();
+                } catch (err) {
+                    showAppAlert("Gagal keluar kelompok: " + err.message);
+                }
+            });
+        }
+
+        // --- Pilihan individu ---
+        function pilihIndividu(taskIndex) {
+            let uploadArea = document.getElementById(`upload-area-${taskIndex}`);
+            if (!uploadArea) return;
+            let choiceDiv = document.getElementById(`choice-container-${taskIndex}`);
+            if (choiceDiv) choiceDiv.style.display = 'none';
+
+            uploadArea.innerHTML = `
+            <div class="upload-area-individu">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <span style="font-weight:600; color:#065f46;">📤 Upload Tugas Individu</span>
+                <button class="btn btn-secondary" style="padding:4px 10px; font-size:11px;" onclick="kembaliKePilihan(${taskIndex})">← Kembali</button>
+              </div>
+              <input type="file" id="s-tugas-file-${taskIndex}" style="display:block; margin-bottom:8px; font-size:12px; width:100%; border:none; padding:0;" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.zip,.rar">
+              <button class="btn btn-secondary w-full" style="padding:6px; font-size:var(--font-small);" onclick="uploadTugasIndividu(${taskIndex})">Upload Tugas</button>
+            </div>
+          `;
+        }
+
+        function kembaliKePilihan(taskIndex) {
+            let uploadArea = document.getElementById(`upload-area-${taskIndex}`);
+            if (uploadArea) uploadArea.innerHTML = '';
+            let choiceDiv = document.getElementById(`choice-container-${taskIndex}`);
+            if (choiceDiv) choiceDiv.style.display = 'flex';
+        }
+
+        function pilihKelompok(taskIndex) {
+            bukaModalBuatKelompok();
+        }
+
+        // --- Upload individu ---
+        async function uploadTugasIndividu(taskIndex) {
+            let fileInput = document.getElementById(`s-tugas-file-${taskIndex}`);
+            if (fileInput.files.length === 0) return showAppAlert(`Pilih file untuk tugas ${taskIndex+1}.`);
+
+            let file = fileInput.files[0];
+            let t = globalTopikList.find(x => x.id === currentActiveTopikId);
+
+            if (file.size > 5 * 1024 * 1024) {
+                return showAppAlert("File maksimal 5MB.");
+            }
+
+            showAppAlert("Uploading...");
+
+            let reader = new FileReader();
+            reader.onload = async function(e) {
+                let base64Data = e.target.result;
+                let ext = file.name.split('.').pop();
+                let finalFileName = `TGS${taskIndex}_${userSession.kelas}_${userSession.nama}_${t.id}.${ext}`;
+
+                try {
+                    const res = await callGAS('uploadFileTugasIndex', base64Data, finalFileName, userSession.username,
+                        userSession.nama, userSession.tingkat, userSession.kelas, currentActiveTopikId,
+                        taskIndex);
+                    if (res.success) {
+                        showAppAlert("Tugas berhasil diupload!");
+                        renderFormTugasSiswa(t);
+                    } else {
+                        showAppAlert("Gagal upload: " + (res.error || "Unknown error"));
+                    }
+                } catch (err) {
+                    showAppAlert("Gagal upload: " + err.message);
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // --- Upload edit (kelompok atau individu) ---
+        async function uploadTugasEdit(taskIndex) {
+            let fileInput = document.getElementById(`s-tugas-file-${taskIndex}`);
+            if (fileInput.files.length === 0) return showAppAlert(`Pilih file untuk tugas ${taskIndex+1}.`);
+
+            let file = fileInput.files[0];
+            let t = globalTopikList.find(x => x.id === currentActiveTopikId);
+
+            if (file.size > 5 * 1024 * 1024) {
+                return showAppAlert("File maksimal 5MB.");
+            }
+
+            showAppAlert("Uploading...");
+
+            let reader = new FileReader();
+            reader.onload = async function(e) {
+                let base64Data = e.target.result;
+                let ext = file.name.split('.').pop();
+                let finalFileName = `TGS${taskIndex}_${userSession.kelas}_${userSession.nama}_${t.id}.${ext}`;
+
+                try {
+                    // Cek apakah user punya kelompok
+                    const groupInfo = await callGAS('getGroupInfoForTopic', currentActiveTopikId, userSession
+                    .username);
+                    let res;
+                    if (groupInfo) {
+                        res = await callGAS('uploadFileTugasGroup', base64Data, finalFileName, userSession
+                            .username, userSession.nama, userSession.tingkat, userSession.kelas,
+                            currentActiveTopikId, taskIndex);
+                    } else {
+                        res = await callGAS('uploadFileTugasIndex', base64Data, finalFileName, userSession
+                            .username, userSession.nama, userSession.tingkat, userSession.kelas,
+                            currentActiveTopikId, taskIndex);
+                    }
+                    if (res.success) {
+                        showAppAlert("Tugas berhasil diupload!");
+                        renderFormTugasSiswa(t);
+                    } else {
+                        showAppAlert("Gagal upload: " + (res.error || "Unknown error"));
+                    }
+                } catch (err) {
+                    showAppAlert("Gagal upload: " + err.message);
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // ===================================================================
+        //  MODAL KELOMPOK
+        // ===================================================================
+        async function bukaModalBuatKelompok() {
+            try {
+                const classmates = await callGAS('getClassmatesWithGroupStatus', userSession.username,
+                    currentActiveTopikId);
+                let container = document.getElementById("list-classmates-container");
+                if (classmates.length === 0) {
+                    container.innerHTML = "<p style='color:var(--text-muted);'>Tidak ada siswa lain di kelas Anda.</p>";
+                } else {
+                    let html = "";
+                    classmates.forEach(c => {
+                        let disabledAttr = c.hasGroup ? "disabled" : "";
+                        let extraInfo = "";
+                        if (c.hasGroup) {
+                            let leaderName = c.leader || "—";
+                            extraInfo =
+                                ` <span style="color:#991b1b; font-size:11px; font-style:italic;">(Sudah di kelompok: ${c.groupName} — Ketua: ${leaderName})</span>`;
+                        }
+                        let classDiv = c.hasGroup ? "group-member-checkbox has-group" :
+                            "group-member-checkbox available";
+                        html += `
+                  <div class="${classDiv}">
+                    <label>
+                      <input type="checkbox" name="selected-members" value="${c.username}" ${disabledAttr}>
+                      ${c.nama} ${extraInfo}
+                    </label>
+                  </div>
+                `;
+                    });
+                    container.innerHTML = html;
+                }
+                document.getElementById("modal-create-group-overlay").style.display = "flex";
+            } catch (err) {
+                showAppAlert("Gagal memuat daftar teman: " + err.message);
+            }
+        }
+
+        function tutupModalGroup() {
+            document.getElementById("modal-create-group-overlay").style.display = "none";
+        }
+
+        async function buatKelompokDariModal() {
+            let checkboxes = document.querySelectorAll('input[name="selected-members"]:checked');
+            let selected = [];
+            checkboxes.forEach(cb => selected.push(cb.value));
+            let total = selected.length + 1;
+            if (total < 3) {
+                return showAppAlert("Minimal total 3 orang (termasuk Anda). Pilih minimal 2 teman.");
+            }
+            if (total > 5) {
+                return showAppAlert("Maksimal 5 orang per kelompok. Anda hanya bisa memilih maksimal 4 teman.");
+            }
+            showAppAlert("Sedang membuat kelompok...");
+            try {
+                const msg = await callGAS('createGroup', currentActiveTopikId, userSession.username, selected);
+                showAppAlert(msg);
+                tutupModalGroup();
+                let t = globalTopikList.find(x => x.id === currentActiveTopikId);
+                renderFormTugasSiswa(t);
+            } catch (err) {
+                showAppAlert("Gagal buat kelompok: " + err.message);
+            }
+        }
+
+        // ===================================================================
+        //  FORUM KELAS
+        // ===================================================================
+        async function muatUlangForumKelasSiswa() {
+            let container = document.getElementById("siswa-diskusi-kelas");
+            container.innerHTML = "Memuat...";
+            let t = globalTopikList.find(x => x.id === currentActiveTopikId);
+            if (!t) return;
+
+            try {
+                const listDiskusi = await callGAS('getDiskusiKelas', currentActiveTopikId, userSession.tingkat,
+                    userSession.kelas);
+                let html = "";
+
+                let jawabanSaya = listDiskusi.find(item => item.username === userSession.username);
+                let teksJawabanSayaArr = jawabanSaya ? jawabanSaya.jawabanArr : null;
+
+                let boxSendiri = document.getElementById("box-diskusi-siswa-sendiri");
+                if (!boxSendiri) {
+                    boxSendiri = document.createElement('div');
+                    boxSendiri.id = "box-diskusi-siswa-sendiri";
+                    boxSendiri.style.cssText =
+                        "background:#d1fae5; padding:12px 16px; margin-bottom:16px; border-radius:8px; border:1px solid #059669; color:#064e3b; font-size:var(--font-small); display:none; line-height:1.5;";
+                    document.getElementById("box-diskusi-siswa-container").insertBefore(boxSendiri, document
+                        .getElementById("dynamic-diskusi-forms"));
+                }
+
+                listDiskusi.forEach(item => {
+                    if (item.username === userSession.username) return;
+
+                    let htmlKomentar = "";
+                    item.komentarList.forEach(k => {
+                        htmlKomentar += `
+                  <div style="background:var(--card-white); padding:6px 12px; margin-top:4px; border-radius:4px; border:1px solid var(--border-color); font-size:12px;">
+                    <b style="color:var(--primary-blue);">${k.penulisNama}:</b> ${k.komentar}
+                  </div>
+                `;
+                    });
+
+                    let jwbTextFormatted = item.jawabanArr.map((j, idx) => `<b>${idx+1}:</b> ${j}`).join('<br>');
+
+                    html += `
+                <div style="border-bottom:1px solid var(--border-color); padding-bottom:12px; margin-bottom:12px;">
+                  <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                    <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(item.nama)}&background=f1f5f9&color=475569" style="width:28px; height:28px; border-radius:50%;">
+                    <span style="font-weight:700; font-size:14px;">${item.nama}</span>
+                  </div>
+                  <p style="margin:0 0 10px 0; background:var(--card-white); padding:10px; border-radius:6px; border:1px solid var(--border-color); font-size:var(--font-small);">${jwbTextFormatted}</p>
+
+                  <div style="margin-left:20px; border-left:3px solid var(--border-color); padding-left:12px;">
+                    ${htmlKomentar}
+                    <div style="display:flex; gap:6px; margin-top:8px;">
+                      <input type="text" id="input-komentar-${item.username}" placeholder="Balas..." style="margin:0; padding:6px 10px; font-size:12px; flex:1;">
+                      <button class="btn" style="padding:4px 12px; font-size:11px;" onclick="submitKomentarKeSiswa('${item.username}')">Reply</button>
+                    </div>
+                  </div>
+                </div>
+              `;
+                });
+
+                if (teksJawabanSayaArr && teksJawabanSayaArr.length > 0) {
+                    boxSendiri.style.display = "block";
+                    let myJwb = teksJawabanSayaArr.map((j, idx) => `<b>${idx+1}:</b> "${j}"`).join('<br>');
+                    boxSendiri.innerHTML = `<h4 style="margin:0 0 6px 0; color:#059669; font-size:14px;">✅ Jawaban Anda</h4>${myJwb}`;
+                } else {
+                    boxSendiri.style.display = "none";
+                }
+
+                container.innerHTML = html ||
+                    "<p style='color:var(--text-muted); font-style:italic; padding:16px; text-align:center;'>Belum ada diskusi teman.</p>";
+            } catch (err) {
+                container.innerHTML = `<p style="color:#ef4444;">Gagal muat diskusi: ${err.message}</p>`;
+            }
+        }
+
+        async function kirimMultiDiskusiSiswa() {
+            let t = globalTopikList.find(x => x.id === currentActiveTopikId);
+            if (!t.diskusi || t.diskusi.length === 0) return;
+
+            let arrJawaban = [];
+            for (let i = 0; i < t.diskusi.length; i++) {
+                let val = document.getElementById(`s-diskusi-form-${i}`).value;
+                if (!val) return showAppAlert(`Jawaban soal ${i+1} harus diisi!`);
+                arrJawaban.push(val);
+            }
+
+            try {
+                await callGAS('simpanJawabanDiskusiArray', userSession.username, userSession.nama, userSession.tingkat,
+                    userSession.kelas, currentActiveTopikId, arrJawaban);
+                showAppAlert("Jawaban diskusi berhasil disimpan!");
+                refreshAttemptStatusSiswa();
+                muatUlangForumKelasSiswa();
+            } catch (err) {
+                showAppAlert("Gagal simpan diskusi: " + err.message);
+            }
+        }
+
+        async function submitKomentarKeSiswa(targetUsername) {
+            let inputEl = document.getElementById(`input-komentar-${targetUsername}`);
+            let komentar = inputEl.value;
+            if (!komentar) return showAppAlert("Isi komentar terlebih dahulu.");
+
+            try {
+                await callGAS('submitKomentarDiskusi', currentActiveTopikId, targetUsername, userSession.username,
+                    userSession.nama, komentar);
+                inputEl.value = "";
+                muatUlangForumKelasSiswa();
+            } catch (err) {
+                showAppAlert("Gagal kirim komentar: " + err.message);
+            }
+        }
+
+        // ===================================================================
+        //  SISWA - REKAP NILAI
+        // ===================================================================
+        async function muatRekapNilaiSiswa() {
+            try {
+                const rekapList = await callGAS('getRekapNilaiSiswa', userSession.username);
+                let trHtml = "";
+                if (rekapList.length === 0) {
+                    trHtml = "<tr><td colspan='5' style='text-align:center; padding:20px;'>Belum ada data nilai.</td></tr>";
+                } else {
+                    rekapList.forEach(r => {
+                        trHtml += `
+                  <tr>
+                    <td style="font-weight:600;">${r.namaTopik}</td>
+                    <td style="text-align:center;">${r.pre !== "" ? r.pre : '-'}</td>
+                    <td style="text-align:center; font-weight:700; color:var(--primary-blue);">${r.post !== "" ? r.post : '-'}</td>
+                    <td style="text-align:center;">${r.nDiskusi || '-'}</td>
+                    <td style="text-align:center;">${r.nTugas || '-'}</td>
+                  </tr>
+                `;
+                    });
+                }
+                document.getElementById("tbody-rekap-siswa").innerHTML = trHtml;
+            } catch (err) {
+                document.getElementById("tbody-rekap-siswa").innerHTML =
+                    `<tr><td colspan="5" style="color:#ef4444;">Gagal muat rekap: ${err.message}</td></tr>`;
+            }
+        }
+
+        // ===================================================================
+        //  PDF VIEWER
+        // ===================================================================
+        function bukaPdfViewer(event) {
+            event.preventDefault();
+            let link = document.getElementById("btn-siswa-pdf");
+            let url = link.href;
+            if (!url || url === "#" || url === "javascript:void(0)") {
+                showAppAlert("Materi PDF belum tersedia atau terkunci.");
+                return;
+            }
+            document.getElementById("pdf-viewer-iframe").src = url;
+            document.getElementById("pdf-viewer-overlay").style.display = "flex";
+        }
+
+        function tutupPdfViewer() {
+            document.getElementById("pdf-viewer-iframe").src = "";
+            document.getElementById("pdf-viewer-overlay").style.display = "none";
+        }
+
+        // ===================================================================
+        //  CAT UJIAN
+        // ===================================================================
+        async function konfirmasiMulaiUjianCAT(jenis) {
+            let tCek = globalTopikList.find(x => x.id === currentActiveTopikId);
+            let fieldCek = (jenis === 'Pre') ? "rilisPre" : "rilisPost";
+            if (!waktuSudahRilis(waktuRilisSub(tCek, fieldCek))) {
+                return showAppAlert(`🔒 ${jenis}-Tes terkunci hingga: ${waktuRilisSub(tCek, fieldCek).replace("T", " ")}`);
+            }
+            showAppConfirm(`Mulai ${jenis}-Tes? (60 menit, 3x pelanggaran = berhenti)`, async function() {
+                try {
+                    const soalList = await callGAS('getSoal', currentActiveTopikId, jenis);
+                    activeExamQuestions = soalList;
+                    if (activeExamQuestions.length === 0) {
+                        return showAppAlert("Belum ada soal di bank.");
+                    }
+                    userSelectedAnswers = new Array(activeExamQuestions.length).fill(null);
+                    currentQuestionIndex = 0;
+                    screenViolationCounter = 0;
+                    isCurrentlyInExam = true;
+
+                    document.getElementById("lbl-cat-jenis").innerText = jenis.toUpperCase() + " TES";
+                    document.getElementById("lbl-cat-warning").innerText = `Awas: 0/3`;
+
+                    renderSoalTunggalCAT();
+
+                    let de = document.documentElement;
+                    if (de.requestFullscreen) de.requestFullscreen();
+                    else if (de.webkitRequestFullscreen) de.webkitRequestFullscreen();
+
+                    document.getElementById("ujian-cat-page").style.display = "block";
+
+                    examTimeRemaining = 3600;
+                    updateTimerDisplay();
+                    examTimerInterval = setInterval(catTimerTick, 1000);
+
+                } catch (err) {
+                    showAppAlert("Gagal memulai ujian: " + err.message);
+                }
+            });
+        }
+
+        function catTimerTick() {
+            if (!isCurrentlyInExam) {
+                clearInterval(examTimerInterval);
+                return;
+            }
+            examTimeRemaining--;
+            updateTimerDisplay();
+
+            if (examTimeRemaining <= 0) {
+                clearInterval(examTimerInterval);
+                showAppAlert("⏰ Waktu habis! Jawaban akan dikirim.");
+                prosesKirimDanTutupCAT();
+            }
+        }
+
+        function updateTimerDisplay() {
+            let m = Math.floor(examTimeRemaining / 60);
+            let s = examTimeRemaining % 60;
+            let displayTime = (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
+            document.getElementById("cat-timer-display").innerText = displayTime;
+
+            if (examTimeRemaining <= 300) {
+                document.getElementById("cat-timer-display").style.background = "#b91c1c";
+                document.getElementById("cat-timer-display").style.color = "#ffffff";
+            } else {
+                document.getElementById("cat-timer-display").style.background = "#fee2e2";
+                document.getElementById("cat-timer-display").style.color = "#ef4444";
+            }
+        }
+
+        function renderSoalTunggalCAT() {
+            if (activeExamQuestions.length === 0) return;
+            let s = activeExamQuestions[currentQuestionIndex];
+            let jawabanTerpilih = userSelectedAnswers[currentQuestionIndex];
+
+            let htmlSoal = `
+            <div style="background:var(--card-white); padding:20px 24px; border-radius:12px; border-left:4px solid var(--primary-blue); box-shadow:var(--shadow-sm);">
+              <p style="font-weight:700; margin-top:0; font-size:16px; border-bottom:1px solid var(--border-color); padding-bottom:10px; margin-bottom:14px;">Soal ${currentQuestionIndex + 1}:</p>
+              <p style="font-size:15px;">${s.pertanyaan}</p>
+          `;
+
+            s.options.forEach(opt => {
+                let checkedAttr = (opt.key === jawabanTerpilih) ? "checked" : "";
+                htmlSoal += `
+              <label style="display:block; margin:8px 0; cursor:pointer; font-weight:500; font-size:14px; background:var(--bg-main); padding:10px 14px; border-radius:6px; border:1px solid var(--border-color);">
+                <input type="radio" name="opt_cat" value="${opt.key}" ${checkedAttr} onchange="simpanPilihanLokalCAT('${opt.key}')" style="margin-right:12px;">
+                ${opt.text}
+              </label>
+            `;
+            });
+            htmlSoal += `</div>`;
+            document.getElementById("box-render-soal-cat").innerHTML = htmlSoal;
+
+            renderGridNomorCAT();
+        }
+
+        function renderGridNomorCAT() {
+            let container = document.getElementById("cat-grid-nomor-container");
+            let html = "";
+            for (let i = 0; i < activeExamQuestions.length; i++) {
+                let bgStyle = "background:var(--card-white);";
+                let colorStyle = "color:var(--text-dark);";
+                let borderStyle = "border-color:var(--border-color);";
+
+                if (userSelectedAnswers[i] !== null) {
+                    bgStyle = "background:var(--primary-blue);";
+                    colorStyle = "color:#fff;";
+                    borderStyle = "border-color:var(--primary-blue);";
+                }
+
+                if (i === currentQuestionIndex) {
+                    borderStyle = "border-color:#fbbf24; border-width:2px; font-weight:700;";
+                }
+
+                html +=
+                    `<div class="cat-number-box" style="${bgStyle} ${colorStyle} ${borderStyle}" onclick="lompatKeSoalCAT(${i})">${i+1}</div>`;
+            }
+            container.innerHTML = html;
+        }
+
+        function simpanPilihanLokalCAT(kunciPilihan) {
+            userSelectedAnswers[currentQuestionIndex] = kunciPilihan;
+            renderGridNomorCAT();
+        }
+
+        function geserSoalCAT(step) {
+            let baru = currentQuestionIndex + step;
+            if (baru >= 0 && baru < activeExamQuestions.length) {
+                currentQuestionIndex = baru;
+                renderSoalTunggalCAT();
+            }
+        }
+
+        function lompatKeSoalCAT(indexTujuan) {
+            currentQuestionIndex = indexTujuan;
+            renderSoalTunggalCAT();
+        }
+
+        function kalkulasiSelesaiUjianCAT() {
+            showAppConfirm("Kirim jawaban?", function() {
+                prosesKirimDanTutupCAT();
+            });
+        }
+
+        async function prosesKirimDanTutupCAT() {
+            clearInterval(examTimerInterval);
+            isCurrentlyInExam = false;
+            let benar = 0;
+            activeExamQuestions.forEach((s, idx) => {
+                let terpilih = userSelectedAnswers[idx];
+                if (terpilih === s.kunci) benar++;
+            });
+            let skor = Math.round((benar / activeExamQuestions.length) * 100) || 0;
+
+            if (document.exitFullscreen) document.exitFullscreen();
+            else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+
+            document.getElementById("ujian-cat-page").style.display = "none";
+
+            try {
+                await callGAS('simpanNilaiUjian', userSession.username, userSession.nama, userSession.tingkat,
+                    userSession.kelas, currentActiveTopikId,
+                    document.getElementById("lbl-cat-jenis").innerText.includes("PRE") ? "Pre" : "Post", skor);
+                showAppAlert("Ujian selesai! Skor: " + skor + ".");
+                refreshAttemptStatusSiswa();
+            } catch (err) {
+                showAppAlert("Gagal simpan nilai: " + err.message);
+            }
+        }
+
+        // ===================================================================
+        //  FULLSCREEN DETEKSI
+        // ===================================================================
+        document.addEventListener("fullscreenchange", periksaStatusLayarCAT);
+        document.addEventListener("webkitfullscreenchange", periksaStatusLayarCAT);
+        window.addEventListener("blur", function() {
+            if (isCurrentlyInExam) {
+                catatPelanggaranLayar();
+            }
+        });
+
+        function periksaStatusLayarCAT() {
+            if (!isCurrentlyInExam) return;
+            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+                catatPelanggaranLayar();
+                document.getElementById("fs-force-overlay").style.display = "flex";
+            }
+        }
+
+        function kembaliFullscreenDariForce() {
+            let de = document.documentElement;
+            if (de.requestFullscreen) de.requestFullscreen();
+            else if (de.webkitRequestFullscreen) de.webkitRequestFullscreen();
+            document.getElementById("fs-force-overlay").style.display = "none";
+        }
+
+        function catatPelanggaranLayar() {
+            if (!isCurrentlyInExam) return;
+            screenViolationCounter++;
+            document.getElementById("lbl-cat-warning").innerText = `Awas: ${screenViolationCounter}/3`;
+            if (screenViolationCounter >= 3) {
+                showAppAlert("⚠️ Pelanggaran layar 3x! Ujian dihentikan.");
+                document.getElementById("fs-force-overlay").style.display = "none";
+                prosesKirimDanTutupCAT();
+            }
+        }
+
+        // ===================================================================
+        //  INISIALISASI
+        // ===================================================================
+        // Saat halaman dimuat, pastikan login visible
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById("app-login").style.display = "block";
+        });
+    </script>
+</body>
+</html>
